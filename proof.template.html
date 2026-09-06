@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>书目校对 / 去重工具</title>
+<style>
+  :root{
+    --line:#e5e7eb; --mut:#6b7280; --blue:#2563eb; --green:#059669; --red:#dc2626; --bg:#f3f4f6;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:#111827}
+  header{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid var(--line);padding:8px 12px}
+  h1{font-size:16px;margin:0 0 6px}
+  .bar{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+  input[type=text],input[type=search],select{border:1px solid var(--line);border-radius:6px;padding:5px 8px;font-size:13px;outline-color:var(--blue)}
+  #q{flex:1;min-width:160px}
+  button{border:1px solid var(--line);background:#fff;border-radius:6px;padding:5px 10px;font-size:13px;cursor:pointer}
+  button:hover{border-color:#c7cbd1;background:#f9fafb}
+  button.blue{background:var(--blue);border-color:var(--blue);color:#fff}
+  button.green{background:var(--green);border-color:var(--green);color:#fff}
+  button.red{background:#fff;border-color:var(--red);color:var(--red)}
+  .stats{font-size:12px;color:var(--mut);margin-left:auto}
+  .hint{font-size:12px;color:var(--mut);margin-top:5px;line-height:1.5}
+  main{padding:10px 12px 60px;max-width:1200px;margin:0 auto}
+  .group{border:1px solid var(--line);border-radius:10px;background:#fff;margin:10px 0;overflow:hidden}
+  .ghead{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:8px 10px;background:#fafafa;border-bottom:1px solid var(--line)}
+  .ghead b{font-size:14px}
+  .ghead .n{color:var(--mut);font-size:12px;font-weight:normal}
+  .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px;padding:10px}
+  .card{border:1px solid var(--line);border-radius:8px;padding:8px;background:#fff}
+  .card.del{opacity:.45;background:#fef2f2}
+  .thumb{position:relative;aspect-ratio:3/4;background:#eee;border-radius:6px;overflow:hidden;margin-bottom:6px}
+  .thumb img{width:100%;height:100%;object-fit:contain;display:block}
+  .delmark{position:absolute;top:4px;left:4px;background:var(--red);color:#fff;font-size:11px;padding:1px 5px;border-radius:4px;display:none}
+  .card.del .delmark{display:block}
+  .fname{font-size:10px;color:#9ca3af;word-break:break-all;margin-bottom:4px}
+  .field{margin:3px 0}
+  .field label{font-size:11px;color:var(--mut);display:block}
+  .field input[type=text]{width:100%;font-size:12px;padding:3px 6px}
+  .chips{margin-top:4px}
+  .chip{display:inline-block;font-size:10px;background:#eef2ff;color:#3730a3;border:1px solid #c7d2fe;border-radius:10px;padding:1px 6px;margin:2px 2px 0 0;cursor:pointer}
+  .chip:hover{background:#e0e7ff}
+  .row{display:flex;gap:8px;align-items:center;margin-top:4px}
+  .row label{font-size:12px;display:flex;align-items:center;gap:3px;cursor:pointer}
+  a.zoom{font-size:11px;color:var(--blue);text-decoration:none}
+  .empty{color:var(--mut);text-align:center;padding:30px 0}
+  .tip{padding:10px 12px;font-size:12px;line-height:1.6}
+  .tip code{background:#eef2ff;padding:1px 5px;border-radius:4px}
+</style>
+</head>
+<body>
+<header>
+  <h1>书目校对 / 去重工具</h1>
+  <div class="bar">
+    <input id="q" type="search" placeholder="搜索 id / 书名 / 作者 / 文件名…" />
+    <button id="btnAll" class="blue">按书名分组</button>
+    <button id="btnList">全部平铺</button>
+    <button id="btnDelOnly">只看已删</button>
+    <button id="btnDelNone">全部取消删除</button>
+    <button id="btnReset">重置本页</button>
+    <button id="btnExport" class="green">导出 booklist.json</button>
+    <span class="stats" id="stats"></span>
+  </div>
+  <div class="hint">
+    用法：① 同名会<b>自动分组</b>，缩略图并排便于判断“同一本拍多张（删到只剩1张）”还是“多本在售（都保留）”；② 直接改输入框里的书名/作者；
+    点蓝字<b>OCR候选</b>可把识别出的文字填入书名；③ 勾选 <b>删除</b> 去掉不要的图；④ 改完点 <b>导出 booklist.json</b> → 覆盖保存到 <code>e:\book\booklist.json</code> → 运行 <code>node build-page.cjs</code> 生成正式页面。
+  </div>
+</header>
+<main id="main"></main>
+
+<script>
+// ============ 数据（由 build-page.cjs 注入，勿手改此行结构） ============
+const RAW = __PROOF_DATA__;
+
+let items = RAW.map(r => ({ ...r, id: Number(r.id), title: r.title||"", author: r.author||"" }));
+let deleted = new Set();
+let view = "groups";     // groups | list | delonly
+let query = "";
+
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+const cjk = t => /[\u4e00-\u9fff]/.test(t||"");
+const norm = t => (t||"").trim();
+
+function matched(it){
+  if(!query) return true;
+  const q = query.toLowerCase();
+  return String(it.id).includes(q) || norm(it.title).toLowerCase().includes(q)
+      || norm(it.author).toLowerCase().includes(q)
+      || it.file.toLowerCase().includes(q);
+}
+function stats(){
+  const d = deleted.size;
+  const groups = view!=='list' ? groupItems(items.filter(i=>!deleted.has(i.id)&&matched(i))).length : 0;
+  $("#stats").textContent = `共 ${items.length} | 已删 ${d} | 剩余 ${items.length-d}${groups?` | 组 ${groups}`:""}`;
+}
+function groupItems(arr){
+  const m = new Map();
+  for(const it of arr){ const k = norm(it.title) || "(书名待补)"; if(!m.has(k)) m.set(k,[]); m.get(k).push(it); }
+  const g = [...m.values()];
+  // 待补放最后；其余按 组大小 降序，再按标题
+  g.sort((a,b)=>{
+    const ka=a[0].title, kb=b[0].title;
+    if(!ka && kb) return 1; if(ka && !kb) return -1;
+    if(!ka && !kb) return 0;
+    if(b.length!==a.length) return b.length-a.length;
+    return norm(ka).localeCompare(norm(kb),'zh');
+  });
+  return g;
+}
+function cardHTML(it){
+  const ocrTokens = (it.ocr||"").split("|").map(s=>s.trim()).filter(Boolean);
+  const chips = [...new Set(ocrTokens)].slice(0,6)
+    .map(t=>`<span class="chip" data-id="${it.id}" data-set="${esc(t)}">${esc(t)}</span>`).join("");
+  return `
+  <div class="card ${deleted.has(it.id)?"del":""}" data-id="${it.id}">
+    <div class="thumb">
+      <span class="delmark">已删</span>
+      <img src="covers/${esc(it.file)}" alt="" loading="lazy" />
+    </div>
+    <div class="fname">#${it.id} ${esc(it.file)}</div>
+    <div class="field"><label>书名</label><input type="text" data-k="title" value="${esc(it.title)}" /></div>
+    <div class="field"><label>作者 / 版本</label><input type="text" data-k="author" value="${esc(it.author)}" /></div>
+    <div class="chips">${chips}</div>
+    <div class="row">
+      <label><input type="checkbox" data-k="del" ${deleted.has(it.id)?"checked":""} /> 删除</label>
+      <a class="zoom" href="照片/${esc(it.file)}" target="_blank" title="打开 照片/ 里的原图核对">原图</a>
+    </div>
+  </div>`;
+}
+function render(){
+  let src = items.filter(matched);
+  if(view === 'delonly') src = src.filter(i=>deleted.has(i.id));
+  const main = $("#main");
+  let html = "";
+  if(view !== 'list'){
+    const groups = groupItems(src);
+    if(!groups.length){ html = `<div class="empty">无匹配条目</div>`; }
+    for(const g of groups){
+      const kTitle = norm(g[0].title);
+      const kept = g.filter(i=>!deleted.has(i.id));
+      const d = g.length - kept.length;
+      html += `<section class="group" data-title="${esc(kTitle)}">
+        <div class="ghead">
+          <b>${esc(kTitle || "（书名待补）")}</b><span class="n">本组 ${g.length} 张${d?`，已删 ${d}`:""}</span>
+          <span style="flex:1"></span>
+          <button class="g-keepfirst" data-ids="${g.map(i=>i.id).join(",")}">保留首张，删其余</button>
+          <button class="g-del" data-ids="${g.map(i=>i.id).join(",")}">整组删除</button>
+        </div>
+        <div class="cards">${g.map(cardHTML).join("")}</div>
+      </section>`;
+    }
+  } else {
+    if(!src.length){ html = `<div class="empty">无匹配条目</div>`; }
+    else html = `<div class="cards">${src.map(cardHTML).join("")}</div>`;
+  }
+  main.innerHTML = html;
+  stats();
+}
+// 事件：输入框 / OCR 候选 / 删除勾选（事件委托）
+$("#main").addEventListener("input", e => {
+  const t = e.target;
+  if(t.matches('input[data-k="title"],input[data-k="author"]')){
+    const card = t.closest(".card"); const it = items.find(x=>x.id===Number(card.dataset.id));
+    if(it) it[t.dataset.k] = t.value;
+    stats();
+  }
+});
+$("#main").addEventListener("change", e => {
+  const t = e.target;
+  if(t.matches('input[data-k="del"]')){
+    const id = Number(t.closest(".card").dataset.id);
+    if(t.checked) deleted.add(id); else deleted.delete(id);
+    render();
+  }
+});
+$("#main").addEventListener("click", e => {
+  const chip = e.target.closest(".chip");
+  if(chip){
+    const card = chip.closest(".card"); const it = items.find(x=>x.id===Number(card.dataset.id));
+    if(it){ it.title = chip.dataset.set;
+      const inp = card.querySelector('input[data-k="title"]'); if(inp) inp.value = it.title;
+    }
+    return;
+  }
+  const gk = e.target.closest(".g-keepfirst");
+  if(gk){
+    const ids = gk.dataset.ids.split(",").map(Number);
+    ids.forEach((id,i)=>{ if(i>0) deleted.add(id); });
+    render(); return;
+  }
+  const gd = e.target.closest(".g-del");
+  if(gd){
+    gd.dataset.ids.split(",").map(Number).forEach(id=>deleted.add(id));
+    render();
+  }
+});
+$("#q").addEventListener("input", e => { query = e.target.value.trim(); render(); });
+$("#btnAll").addEventListener("click", ()=>{ view="groups"; document.querySelectorAll("#btnAll,#btnList,#btnDelOnly").forEach(b=>b.classList.remove("blue")); $("#btnAll").classList.add("blue"); render(); });
+$("#btnList").addEventListener("click", ()=>{ view="list"; document.querySelectorAll("#btnAll,#btnList,#btnDelOnly").forEach(b=>b.classList.remove("blue")); $("#btnList").classList.add("blue"); render(); });
+$("#btnDelOnly").addEventListener("click", ()=>{ view="delonly"; document.querySelectorAll("#btnAll,#btnList,#btnDelOnly").forEach(b=>b.classList.remove("blue")); $("#btnDelOnly").classList.add("blue"); render(); });
+$("#btnDelNone").addEventListener("click", ()=>{ deleted.clear(); render(); });
+$("#btnReset").addEventListener("click", ()=>{ if(confirm("重置为最初数据？当前所有改动/删除会丢失。")) location.reload(); });
+
+$("#btnExport").addEventListener("click", ()=>{
+  const kept = items.filter(i=>!deleted.has(i.id)).sort((a,b)=>a.id-b.id)
+    .map((it,i)=>({ id:i+1, file:it.file, cover:it.cover, title:norm(it.title), author:norm(it.author), ocr:it.ocr||"" }));
+  const json = JSON.stringify(kept, null, 1);
+  const blob = new Blob([json], {type:"application/json"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "booklist.json";
+  document.body.appendChild(a); a.click();
+  setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 500);
+  alert(`已导出 ${kept.length} 条（删除 ${deleted.size} 条）。\n\n下一步：\n1) 用导出的 booklist.json 覆盖 e:\\book\\booklist.json\n2) 在 e:\\book 运行  node build-page.cjs\n即可更新正式页面 index.html（以及本工具的数据）。`);
+});
+
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>二手书平台</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC",
+        "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+    input, textarea { -webkit-user-select: text; user-select: text; }
+    input[type="search"]::-webkit-search-cancel-button { -webkit-appearance: none; }
+    /* 看大图遮罩：默认整图适配屏幕；双击 1x/2x 切换；放大后单指拖动看细节 */
+    #lightbox{display:none;position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.92);
+      flex-direction:column;align-items:center;justify-content:center;padding:16px;
+      touch-action:manipulation;overflow:hidden}
+    #lightbox.open{display:flex}
+    #lightbox img{max-width:92vw;max-height:82vh;object-fit:contain;border-radius:6px;
+      box-shadow:0 10px 40px rgba(0,0,0,.5);transform-origin:center center;will-change:transform;
+      user-select:none;-webkit-user-select:none;-webkit-user-drag:none;touch-action:manipulation}
+    #lightbox .cap{margin-top:14px;color:#cbd5e1;font-size:13px;text-align:center;pointer-events:none}
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col">
+
+  <!-- ============ 固定顶部区域：横幅 + 二维码 + 搜索 ============ -->
+  <header class="sticky top-0 z-40 shadow-sm">
+    <div class="bg-gradient-to-r from-blue-500 to-blue-600 text-white text-center py-2.5 px-4">
+      <h1 class="text-lg font-bold tracking-wide">二手书平台</h1>
+    </div>
+
+    <div class="bg-white flex flex-col items-center pt-3 pb-1">
+      <button type="button" id="qrBtn"
+         title="点开查看大图（可长按识别）"
+         class="relative block w-28 h-28 p-0 m-0 bg-white rounded-lg overflow-hidden border border-gray-200 shadow-sm cursor-pointer focus:outline-none">
+        <span class="hidden absolute inset-0 items-center justify-center text-gray-400 text-xs pointer-events-none">二维码占位图</span>
+        <img src="二维码.jpg" alt="咨询/付款二维码"
+             class="absolute inset-0 w-full h-full object-contain p-0.5"
+             onerror="this.style.display='none';const s=this.parentElement.querySelector('span');s.classList.remove('hidden');s.classList.add('flex');" />
+      </button>
+      <p class="text-xs text-gray-400 mt-1.5 mb-1">扫码咨询或付款（点图看大图）</p>
+    </div>
+
+    <div class="bg-white px-4 pb-3">
+      <div class="relative max-w-5xl mx-auto">
+        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M17 10.5a6.5 6.5 0 11-13 0 6.5 6.5 0 0113 0z" />
+        </svg>
+        <input id="searchInput" type="search" placeholder="搜索书名、作者..." autocomplete="off"
+               class="w-full rounded-full border border-emerald-200 bg-emerald-50/60 py-2.5 pl-9 pr-4 text-sm outline-none placeholder-gray-400 focus:bg-white focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100 transition" />
+      </div>
+    </div>
+  </header>
+
+  <!-- ============ 书籍展示区域 ============ -->
+  <main class="flex-1 w-full max-w-5xl mx-auto px-4 py-4">
+    <p id="resultInfo" class="text-xs text-gray-400 mb-3"></p>
+
+    <div id="emptyState" class="hidden text-center py-16 text-gray-400">
+      <p class="text-4xl mb-3">📭</p>
+      <p class="text-sm">未找到相关书籍，换个关键词试试</p>
+    </div>
+
+    <div id="bookGrid" class="grid grid-cols-2 gap-3 sm:gap-4 sm:grid-cols-3 lg:grid-cols-4"></div>
+  </main>
+
+  <!-- ============ 页脚 ============ -->
+  <footer class="text-center text-xs text-gray-400 py-5 px-4 pb-[max(env(safe-area-inset-bottom),1.25rem)]">
+    © 2026 二手书平台 | 联系微信：XXXXX
+  </footer>
+
+  <!-- ============ 看大图遮罩 ============ -->
+  <div id="lightbox" onclick="if(event.target===this)closeLightbox()">
+    <button type="button" onclick="closeLightbox()" aria-label="关闭"
+       class="absolute top-3 right-3 z-10 w-9 h-9 rounded-full bg-white/10 hover:bg-white/25 text-white text-xl leading-none cursor-pointer">✕</button>
+    <img id="lightboxImg" src="" alt="" draggable="false" />
+    <p class="cap">双击放大 / 还原 · 放大后可拖动 · 点 ✕ 或空白关闭</p>
+  </div>
+
+  <script>
+    // ============ 书籍数据（由 booklist.json 生成注入） ============
+    const books = __BOOKS_DATA__;
+
+    // ============ 渲染 ============
+    const grid = document.getElementById("bookGrid");
+    const emptyState = document.getElementById("emptyState");
+    const resultInfo = document.getElementById("resultInfo");
+
+    function esc(str) {
+      return String(str ?? "")
+        .replace(/&/g, "&amp;").replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    }
+
+    function cardHtml(book, i) {
+      const hasCover = typeof book.cover === "string" && book.cover.trim() !== "";
+      const titleText = (book.title && book.title.trim()) ? book.title : "（书名待补）";
+      const imgHtml = hasCover
+        ? `<img src="${book.cover}" alt="${esc(titleText)}" loading="lazy" decoding="async"
+              data-zoom title="双击查看大图"
+              class="absolute inset-0 w-full h-full object-contain p-1"
+              onerror="this.style.display='none';this.parentElement.querySelector('.cover-fallback').style.display='flex';" />`
+        : "";
+      const fallbackHtml =
+        `<div class="cover-fallback absolute inset-0 w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-emerald-100 to-emerald-50" style="display:${hasCover ? "none" : "flex"}">
+           <svg class="w-9 h-9 mb-1.5 text-emerald-400" fill="currentColor" viewBox="0 0 24 24">
+             <path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H6.5a2.5 2.5 0 0 0 0 5H20v2H6.5A4.5 4.5 0 0 1 2 20.5v-16zM6.5 4H7v13H6.5a2.49 2.49 0 0 0-.5.05V6.5A2.5 2.5 0 0 1 6.5 4z" opacity=".85"/>
+           </svg>
+           <span class="text-[11px] text-emerald-500/70">暂无封面</span>
+         </div>`;
+      const titleClass = (book.title && book.title.trim()) ? "text-gray-800" : "text-gray-400";
+      return `
+        <article class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden flex flex-col hover:shadow-md transition-shadow">
+          <div class="cover relative aspect-[3/4] bg-gray-100">
+            ${imgHtml}
+            ${fallbackHtml}
+          </div>
+          <div class="px-2.5 pt-2 pb-3 flex flex-col flex-1">
+            <h3 class="font-semibold text-[15px] leading-snug ${titleClass} line-clamp-2">${esc(titleText)}</h3>
+            ${(book.author && book.author.trim()) ? `<p class="text-xs text-gray-500 mt-1 line-clamp-1">${esc(book.author)}</p>` : ""}
+          </div>
+        </article>`;
+    }
+
+    function render(list) {
+      grid.innerHTML = list.map((b, i) => cardHtml(b, i)).join("");
+      const empty = list.length === 0;
+      emptyState.classList.toggle("hidden", !empty);
+      grid.classList.toggle("hidden", empty);
+      resultInfo.textContent = empty ? "" : `共 ${list.length} 本`;
+    }
+
+    // ============ 实时过滤 ============
+    const searchInput = document.getElementById("searchInput");
+    function applyFilter() {
+      const kw = searchInput.value.trim().toLowerCase();
+      const filtered = kw
+        ? books.filter((b) => ((b.title || "") + " " + (b.author || "")).toLowerCase().includes(kw))
+        : books;
+      render(filtered);
+    }
+    searchInput.addEventListener("input", applyFilter);
+
+    // ============ 看大图（点二维码 / 双击封面打开） ============
+    // 打开即整图适配屏幕，不会只显示一部分；双击 1x/2x 切换，放大后可拖动
+    const lightbox = document.getElementById("lightbox");
+    const lbImg = document.getElementById("lightboxImg");
+    let lbZoom = 1, lbX = 0, lbY = 0, lbPointer = null;
+    let lbStartX = 0, lbStartY = 0, lbMoved = false, lastTap = 0;
+
+    function lbApply() {
+      lbImg.style.transform = `translate(${lbX}px, ${lbY}px) scale(${lbZoom})`;
+    }
+    function lbClamp() {
+      const W = lbImg.offsetWidth * lbZoom, H = lbImg.offsetHeight * lbZoom;
+      const vw = lightbox.clientWidth, vh = lightbox.clientHeight;
+      const mx = Math.max(0, (W - vw) / 2), my = Math.max(0, (H - vh) / 2);
+      lbX = Math.max(-mx, Math.min(mx, lbX));
+      lbY = Math.max(-my, Math.min(my, lbY));
+    }
+    function lbReset() {
+      lbZoom = 1; lbX = 0; lbY = 0;
+      lbImg.style.transition = "transform .18s ease";
+      lbApply();
+    }
+    function openLightbox(src, alt) {
+      lbImg.src = src;
+      lbImg.alt = alt || "";
+      lbReset();
+      lightbox.classList.add("open");
+      document.body.style.overflow = "hidden"; // 防止背景滚动
+    }
+    function closeLightbox() {
+      if (!lightbox.classList.contains("open")) return;
+      lightbox.classList.remove("open");
+      lbImg.src = "";
+      document.body.style.overflow = "";
+    }
+
+    // 图片上的触摸/鼠标手势：双击缩放，放大后单指拖动
+    lbImg.addEventListener("pointerdown", (e) => {
+      lbPointer = e.pointerId;
+      lbStartX = e.clientX; lbStartY = e.clientY;
+      lbMoved = false;
+      if (lbZoom > 1) lbImg.setPointerCapture?.(e.pointerId);
+    });
+    lbImg.addEventListener("pointermove", (e) => {
+      if (e.pointerId !== lbPointer || lbZoom <= 1) return;
+      const dx = e.clientX - lbStartX, dy = e.clientY - lbStartY;
+      if (!lbMoved && Math.hypot(dx, dy) < 8) return;
+      lbMoved = true;
+      lbX += dx; lbY += dy;
+      lbStartX = e.clientX; lbStartY = e.clientY;
+      lbClamp();
+      lbImg.style.transition = "none";
+      lbApply();
+    });
+    lbImg.addEventListener("pointerup", (e) => {
+      if (e.pointerId !== lbPointer) return;
+      lbPointer = null;
+      if (lbMoved) return; // 拖动结束，不是点击
+      if (lbZoom > 1) {    // 放大态单击 → 还原 1x
+        lbZoom = 1; lbX = 0; lbY = 0;
+        lbImg.style.transition = "transform .18s ease";
+        lbApply();
+        return;
+      }
+      const now = Date.now(); // 1x 态下两次 300ms 内点击 → 放大 2x
+      if (now - lastTap < 300) {
+        lbZoom = 2; lastTap = 0;
+        lbImg.style.transition = "transform .18s ease";
+        lbApply();
+      } else lastTap = now;
+    });
+    lbImg.addEventListener("pointercancel", () => { lbPointer = null; });
+
+    // 双击封面 → 看大图
+    grid.addEventListener("dblclick", (e) => {
+      const img = e.target.closest("img[data-zoom]");
+      if (img && img.src) openLightbox(img.src, img.alt);
+    });
+
+    // 点击顶部二维码 → 页内大图（整张显示，无需手动缩放）
+    document.getElementById("qrBtn").addEventListener("click", () => {
+      openLightbox("二维码.jpg", "咨询/付款二维码");
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") closeLightbox();
+    });
+
+    // 初次渲染全部
+    render(books);
+  </script>
+</body>
+</html>

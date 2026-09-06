@@ -1,0 +1,17 @@
+# 原始照片原图(约 2.5GB)不入库 —— 仅提交压缩后的 covers/
+照片/
+
+# 部署体积测试 / 打包产物
+1/
+cc/
+cc.zip
+cc (2).zip
+*.zip
+
+# 早期重复诊断脚本(已不用)
+analyze.cjs
+
+# 系统 / 临时文件
+node_modules/
+.DS_Store
+Thumbs.db
