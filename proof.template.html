@@ -41,6 +41,9 @@
   .chips{margin-top:4px}
   .chip{display:inline-block;font-size:10px;background:#eef2ff;color:#3730a3;border:1px solid #c7d2fe;border-radius:10px;padding:1px 6px;margin:2px 2px 0 0;cursor:pointer}
   .chip:hover{background:#e0e7ff}
+  .row2{display:flex;gap:8px}
+  .row2 .field{flex:1;min-width:0}
+  .row2 input{width:100%}
   .row{display:flex;gap:8px;align-items:center;margin-top:4px}
   .row label{font-size:12px;display:flex;align-items:center;gap:3px;cursor:pointer}
   a.zoom{font-size:11px;color:var(--blue);text-decoration:none}
@@ -63,8 +66,9 @@
     <span class="stats" id="stats"></span>
   </div>
   <div class="hint">
-    用法：① 同名会<b>自动分组</b>，缩略图并排便于判断“同一本拍多张（删到只剩1张）”还是“多本在售（都保留）”；② 直接改输入框里的书名/作者；
-    点蓝字<b>OCR候选</b>可把识别出的文字填入书名；③ 勾选 <b>删除</b> 去掉不要的图；④ 改完点 <b>导出 booklist.json</b> → 覆盖保存到 <code>e:\book\booklist.json</code> → 运行 <code>node build-page.cjs</code> 生成正式页面。
+    用法：① 同名会<b>自动分组</b>，缩略图并排便于判断“同一本拍多张（删到只剩1张）”还是“多本在售（都保留）”；② 直接改输入框里的书名/作者；卡片上的
+    <b>单价 ¥</b>（0=面议，不可加入购物车）与<b>库存</b>（0=售罄）也会一并导出；点蓝字<b>OCR候选</b>可把识别出的文字填入书名；③ 勾选 <b>删除</b> 去掉不要的图；
+    ④ 改完点 <b>导出 booklist.json</b> → 覆盖保存到 <code>e:\book\booklist.json</code> → 运行 <code>node build-page.cjs</code> 生成正式页面。
   </div>
 </header>
 <main id="main"></main>
@@ -73,7 +77,14 @@
 // ============ 数据（由 build-page.cjs 注入，勿手改此行结构） ============
 const RAW = __PROOF_DATA__;
 
-let items = RAW.map(r => ({ ...r, id: Number(r.id), title: r.title||"", author: r.author||"" }));
+let items = RAW.map(r => ({
+  ...r,
+  id: Number(r.id),
+  title: r.title||"",
+  author: r.author||"",
+  price: Number.isFinite(+r.price) && +r.price >= 0 ? Math.round(+r.price * 100) / 100 : 9.9,
+  stock: Number.isInteger(+r.stock) && +r.stock >= 0 ? +r.stock : 1,
+}));
 let deleted = new Set();
 let view = "groups";     // groups | list | delonly
 let query = "";
@@ -122,6 +133,10 @@ function cardHTML(it){
     <div class="fname">#${it.id} ${esc(it.file)}</div>
     <div class="field"><label>书名</label><input type="text" data-k="title" value="${esc(it.title)}" /></div>
     <div class="field"><label>作者 / 版本</label><input type="text" data-k="author" value="${esc(it.author)}" /></div>
+    <div class="row2">
+      <div class="field"><label>单价 ¥</label><input type="number" min="0" step="0.1" data-k="price" value="${it.price}" /></div>
+      <div class="field"><label>库存</label><input type="number" min="0" step="1" data-k="stock" value="${it.stock}" /></div>
+    </div>
     <div class="chips">${chips}</div>
     <div class="row">
       <label><input type="checkbox" data-k="del" ${deleted.has(it.id)?"checked":""} /> 删除</label>
@@ -165,6 +180,12 @@ $("#main").addEventListener("input", e => {
     const card = t.closest(".card"); const it = items.find(x=>x.id===Number(card.dataset.id));
     if(it) it[t.dataset.k] = t.value;
     stats();
+  } else if(t.matches('input[data-k="price"]')){
+    const card = t.closest(".card"); const it = items.find(x=>x.id===Number(card.dataset.id));
+    if(it) it.price = Math.max(0, Math.round((parseFloat(t.value)||0) * 100) / 100);
+  } else if(t.matches('input[data-k="stock"]')){
+    const card = t.closest(".card"); const it = items.find(x=>x.id===Number(card.dataset.id));
+    if(it) it.stock = Math.max(0, parseInt(t.value,10)||0);
   }
 });
 $("#main").addEventListener("change", e => {
@@ -205,7 +226,7 @@ $("#btnReset").addEventListener("click", ()=>{ if(confirm("重置为最初数据
 
 $("#btnExport").addEventListener("click", ()=>{
   const kept = items.filter(i=>!deleted.has(i.id)).sort((a,b)=>a.id-b.id)
-    .map((it,i)=>({ id:i+1, file:it.file, cover:it.cover, title:norm(it.title), author:norm(it.author), ocr:it.ocr||"" }));
+    .map((it,i)=>({ id:i+1, file:it.file, cover:it.cover, title:norm(it.title), author:norm(it.author), price:it.price, stock:it.stock, ocr:it.ocr||"" }));
   const json = JSON.stringify(kept, null, 1);
   const blob = new Blob([json], {type:"application/json"});
   const a = document.createElement("a");

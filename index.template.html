@@ -13,15 +13,84 @@
     }
     input, textarea { -webkit-user-select: text; user-select: text; }
     input[type="search"]::-webkit-search-cancel-button { -webkit-appearance: none; }
-    /* 看大图遮罩：默认整图适配屏幕；双击 1x/2x 切换；放大后单指拖动看细节 */
-    #lightbox{display:none;position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.92);
-      flex-direction:column;align-items:center;justify-content:center;padding:16px;
-      touch-action:manipulation;overflow:hidden}
+
+    /* ============ 看大图遮罩（双击封面） ============ */
+    #lightbox{display:none;position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.92);
+      flex-direction:column;align-items:center;justify-content:center;padding:16px}
     #lightbox.open{display:flex}
-    #lightbox img{max-width:92vw;max-height:82vh;object-fit:contain;border-radius:6px;
-      box-shadow:0 10px 40px rgba(0,0,0,.5);transform-origin:center center;will-change:transform;
-      user-select:none;-webkit-user-select:none;-webkit-user-drag:none;touch-action:manipulation}
-    #lightbox .cap{margin-top:14px;color:#cbd5e1;font-size:13px;text-align:center;pointer-events:none}
+    #lightbox img{max-width:94vw;max-height:86vh;object-fit:contain;border-radius:6px;box-shadow:0 10px 40px rgba(0,0,0,.5)}
+    #lightbox .cap{margin-top:14px;color:#cbd5e1;font-size:13px;text-align:center}
+
+    /* ============ 加入购物车按钮 ============ */
+    .addbtn{margin-top:8px;width:100%;display:flex;align-items:center;justify-content:center;gap:2px;
+      border-radius:10px;padding:7px 4px;font-size:12px;font-weight:600;line-height:1;
+      touch-action:manipulation;transition:transform .12s ease}
+    .addbtn:active{transform:scale(.96)}
+    .add-neu{background:#fff7ed;color:#c2410c;border:1px solid #fed7aa}
+    .add-ing{background:#ffedd5;color:#c2410c;border:1px solid #fdba74}
+    .add-full{background:#f97316;color:#fff;border:1px solid #f97316}
+    .add-off{background:#f1f5f9;color:#94a3b8;border:1px solid #e2e8f0;cursor:not-allowed}
+
+    /* ============ 通用遮罩 ============ */
+    .veil{position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:80;opacity:0;pointer-events:none;transition:opacity .22s}
+    .veil.on{opacity:1;pointer-events:auto}
+
+    /* ============ 悬浮购物车按钮 ============ */
+    #cartFab{position:fixed;right:16px;bottom:26px;z-index:70;width:56px;height:56px;border-radius:9999px;
+      background:#ffffff;border:1px solid #fdba74;box-shadow:0 6px 22px rgba(0,0,0,.16);
+      display:flex;align-items:center;justify-content:center;font-size:24px;
+      touch-action:manipulation;transition:transform .12s ease}
+    #cartFab:active{transform:scale(.94)}
+    #cartBadge{position:absolute;top:-3px;right:-3px;min-width:19px;height:19px;padding:0 5px;border-radius:9999px;
+      background:#dc2626;color:#fff;font-size:11px;line-height:19px;text-align:center;font-weight:700;
+      box-shadow:0 1px 3px rgba(0,0,0,.25)}
+    #cartFab.bump{animation:pop .35s ease}
+    @keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.18)}100%{transform:scale(1)}}
+
+    /* ============ 购物车右侧抽屉 ============ */
+    #cartPanel{position:fixed;top:0;right:0;bottom:0;width:min(92vw,390px);background:#fff;z-index:85;
+      transform:translateX(102%);transition:transform .28s ease;display:flex;flex-direction:column;
+      box-shadow:-10px 0 34px rgba(0,0,0,.16)}
+    #cartPanel.open{transform:none}
+    .cp-head{display:flex;align-items:center;justify-content:space-between;padding:15px 16px;border-bottom:1px solid #f1f5f9;flex:none}
+    .cp-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:2px 12px}
+    .cp-item{display:flex;gap:10px;align-items:center;padding:11px 2px;border-bottom:1px dashed #eef2f6}
+    .cp-item img{width:44px;height:58px;object-fit:contain;background:#f8fafc;border-radius:4px;flex:none}
+    .cp-item .it-t{font-size:13px;font-weight:600;line-height:1.3}
+    .cp-item .it-p{font-size:12px;color:#94a3b8;margin-top:1px}
+    .qty{display:flex;align-items:center;gap:2px;flex:none}
+    .qty button{width:27px;height:27px;border-radius:7px;border:1px solid #fdba74;background:#fff;color:#ea580c;font-size:15px;
+      line-height:1;display:flex;align-items:center;justify-content:center;touch-action:manipulation}
+    .qty button:active{background:#ffedd5}
+    .qty button:disabled{color:#cbd5e1;border-color:#e2e8f0;background:#f8fafc}
+    .qty .n{min-width:28px;text-align:center;font-size:13px;font-weight:600}
+    .cp-foot{flex:none;padding:12px 14px calc(12px + env(safe-area-inset-bottom));border-top:1px solid #f1f5f9}
+
+    /* ============ 结算弹窗 ============ */
+    #coPanel{position:fixed;left:50%;top:50%;transform:translate(-50%,-47%) scale(.98);width:min(93vw,540px);
+      max-height:92vh;background:#fff;border-radius:16px;z-index:90;display:flex;flex-direction:column;overflow:hidden;
+      opacity:0;pointer-events:none;transition:.22s;box-shadow:0 22px 60px rgba(0,0,0,.32)}
+    #coPanel.open{opacity:1;transform:translate(-50%,-50%);pointer-events:auto}
+    .co-head{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid #f1f5f9;flex:none}
+    .co-body{overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px 18px calc(14px + env(safe-area-inset-bottom))}
+    .co-lab{font-size:12px;color:#64748b;display:block;margin:10px 0 4px}
+    .co-inp{width:100%;border:1px solid #e2e8f0;border-radius:9px;padding:9px 10px;font-size:14px;outline-color:#f97316;
+      background:#f8fafc}
+    .co-inp:focus{background:#fff}
+
+    /* ============ 进入欢迎提示框 ============ */
+    #welPanel{position:fixed;left:50%;top:50%;transform:translate(-50%,-46%) scale(.96);width:min(86vw,400px);
+      background:#fff;border-radius:20px;z-index:120;box-sizing:border-box;padding:26px 22px 20px;text-align:center;
+      opacity:0;pointer-events:none;transition:.25s;box-shadow:0 22px 60px rgba(0,0,0,.32)}
+    #welPanel.open{opacity:1;transform:translate(-50%,-50%);pointer-events:auto}
+    #welVeil{position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:110;opacity:0;pointer-events:none;transition:opacity .22s}
+    #welVeil.on{opacity:1;pointer-events:auto}
+
+    /* ============ Toast 轻提示 ============ */
+    #toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%);z-index:130;
+      background:rgba(17,24,39,.93);color:#fff;padding:9px 17px;border-radius:999px;font-size:13px;line-height:1.4;
+      opacity:0;pointer-events:none;transition:.25s;max-width:86vw;text-align:center}
+    #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
   </style>
 </head>
 <body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col">
@@ -33,15 +102,16 @@
     </div>
 
     <div class="bg-white flex flex-col items-center pt-3 pb-1">
-      <button type="button" id="qrBtn"
-         title="点开查看大图（可长按识别）"
-         class="relative block w-28 h-28 p-0 m-0 bg-white rounded-lg overflow-hidden border border-gray-200 shadow-sm cursor-pointer focus:outline-none">
+      <!-- 不用 <a 新窗口>：否则微信里点开是裸图要拖；且链接会挡长按“识别图中二维码”。点图改走本页全屏 lightbox -->
+      <div onclick="openLightbox('二维码.jpg','咨询 / 付款二维码')"
+         title="点开放大 · 长按识别"
+         class="relative block w-28 h-28 bg-white rounded-lg overflow-hidden border border-gray-200 shadow-sm cursor-pointer">
         <span class="hidden absolute inset-0 items-center justify-center text-gray-400 text-xs pointer-events-none">二维码占位图</span>
         <img src="二维码.jpg" alt="咨询/付款二维码"
              class="absolute inset-0 w-full h-full object-contain p-0.5"
              onerror="this.style.display='none';const s=this.parentElement.querySelector('span');s.classList.remove('hidden');s.classList.add('flex');" />
-      </button>
-      <p class="text-xs text-gray-400 mt-1.5 mb-1">扫码咨询或付款（点图看大图）</p>
+      </div>
+      <p class="text-xs text-gray-400 mt-1.5 mb-1">长按识别 · 点图可放大</p>
     </div>
 
     <div class="bg-white px-4 pb-3">
@@ -49,8 +119,8 @@
         <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M17 10.5a6.5 6.5 0 11-13 0 6.5 6.5 0 0113 0z" />
         </svg>
-        <input id="searchInput" type="search" placeholder="搜索书名、作者..." autocomplete="off"
-               class="w-full rounded-full border border-emerald-200 bg-emerald-50/60 py-2.5 pl-9 pr-4 text-sm outline-none placeholder-gray-400 focus:bg-white focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100 transition" />
+        <input id="searchInput" type="search" placeholder="搜索书名" autocomplete="off"
+               class="w-full rounded-full border border-orange-200 bg-orange-50/60 py-2.5 pl-9 pr-4 text-sm outline-none placeholder-gray-400 focus:bg-white focus:border-orange-400 focus:ring-2 focus:ring-orange-100 transition" />
       </div>
     </div>
   </header>
@@ -72,30 +142,248 @@
     © 2026 二手书平台 | 联系微信：XXXXX
   </footer>
 
-  <!-- ============ 看大图遮罩 ============ -->
-  <div id="lightbox" onclick="if(event.target===this)closeLightbox()">
-    <button type="button" onclick="closeLightbox()" aria-label="关闭"
-       class="absolute top-3 right-3 z-10 w-9 h-9 rounded-full bg-white/10 hover:bg-white/25 text-white text-xl leading-none cursor-pointer">✕</button>
-    <img id="lightboxImg" src="" alt="" draggable="false" />
-    <p class="cap">双击放大 / 还原 · 放大后可拖动 · 点 ✕ 或空白关闭</p>
+  <!-- ============ 双击封面看大图 ============ -->
+  <div id="lightbox" onclick="closeLightbox()">
+    <img id="lightboxImg" src="" alt="" />
+    <p class="cap">点击任意处或按 Esc 关闭</p>
   </div>
 
+  <!-- ============ 悬浮购物车按钮 ============ -->
+  <button id="cartFab" aria-label="打开购物车">🛒<span id="cartBadge" style="display:none">0</span></button>
+
+  <!-- ============ 购物车抽屉 ============ -->
+  <div id="cartVeil" class="veil" onclick="closeCart()"></div>
+  <aside id="cartPanel" aria-label="购物车" role="dialog">
+    <div class="cp-head">
+      <h2 class="text-[16px] font-bold" style="margin:0">🛒 购物车<span id="cartTitleCount" style="font-size:13px;color:#94a3b8;font-weight:400"></span></h2>
+      <button onclick="closeCart()" aria-label="关闭"
+              style="border:none;background:none;font-size:20px;color:#64748b;line-height:1;padding:4px">✕</button>
+    </div>
+    <div id="cartList" class="cp-body"></div>
+    <div class="cp-foot">
+      <div class="flex items-center justify-between mb-3">
+        <button id="btnClearCart" style="border:none;background:none;color:#94a3b8;font-size:12px;padding:4px">清空购物车</button>
+        <div style="font-size:13px;color:#64748b">合计：<b id="cartTotal" class="text-rose-600" style="font-size:18px">¥0.00</b></div>
+      </div>
+      <button id="btnCheckout" class="w-full rounded-xl bg-orange-500 text-white text-[16px] font-bold py-3"
+              style="touch-action:manipulation">去结算</button>
+    </div>
+  </aside>
+
+  <!-- ============ 结算弹窗 ============ -->
+  <div id="coVeil" class="veil" onclick="closeCheckout()"></div>
+  <div id="coPanel" role="dialog" aria-label="确认订单">
+    <div class="co-head">
+      <h2 class="text-[16px] font-bold" style="margin:0">📋 确认订单</h2>
+      <button onclick="closeCheckout()" aria-label="关闭"
+              style="border:none;background:none;font-size:20px;color:#64748b;line-height:1;padding:4px">✕</button>
+    </div>
+    <div class="co-body">
+      <!-- 买家信息 -->
+      <div style="font-size:14px;font-weight:700;color:#334155;margin-top:2px">买家信息</div>
+      <label class="co-lab">姓名 *</label>
+      <input id="ckName" class="co-inp" type="text" placeholder="怎么称呼您" autocomplete="name" />
+      <label class="co-lab">手机号 / 微信号 *</label>
+      <input id="ckPhone" class="co-inp" type="tel" placeholder="方便店主联系您" autocomplete="tel" />
+      <label class="co-lab">宿舍 / 收货地址</label>
+      <input id="ckAddr" class="co-inp" type="text" placeholder="如：3 栋 501（可选）" />
+
+      <!-- 订单摘要 -->
+      <div style="font-size:14px;font-weight:700;color:#334155;margin-top:16px">订单摘要 <span id="coCount" style="font-size:12px;color:#94a3b8;font-weight:400"></span></div>
+      <div id="coItems" style="border-top:1px solid #f1f5f9;margin-top:4px"></div>
+
+      <!-- 金额 + 加店主微信 -->
+      <div class="flex items-end justify-between mt-3"
+           style="background:#fff7ed;border:1px solid #fed7aa;border-radius:12px;padding:12px 14px">
+        <div style="font-size:13px;color:#9a3412;line-height:1.6">
+          待确认订单金额<br />
+          <span style="font-size:11px;color:#c2410c">先联系店主确认，再付款</span>
+        </div>
+        <div class="text-rose-600" style="font-size:24px;font-weight:800">¥<span id="coTotal">0.00</span></div>
+      </div>
+
+      <!-- 微信二维码（与顶部同一个联系码） -->
+      <div class="text-center mt-4">
+        <div id="qrWrap" style="width:min(240px,72vw);height:min(240px,72vw);margin:0 auto;background:#fff;border:1px solid #e2e8f0;border-radius:14px;overflow:hidden;position:relative">
+          <!-- TODO: REPLACE_ME 若日后要专用的“店主微信好友码”，替换下方 src 为新的图片文件名即可 -->
+          <img id="ckQr" src="二维码.jpg" alt="店主微信二维码" style="width:100%;height:100%;object-fit:contain;padding:6px"
+               onerror="this.style.display='none';document.getElementById('qrFallback').style.display='flex';" />
+          <span id="qrFallback" style="display:none;position:absolute;inset:0;align-items:center;justify-content:center;color:#94a3b8;font-size:12px">二维码图片缺失<br/>(二维码.jpg)</span>
+        </div>
+        <p class="mt-3 mb-0" style="font-size:14px;font-weight:800;color:#dc2626;line-height:1.6">
+          请长按识别上方二维码添加店主微信，<br />添加后请发送您的订单信息，确认无误后再进行付款！
+        </p>
+      </div>
+
+      <!-- 一键复制 -->
+      <button id="btnCopy" class="w-full rounded-xl text-white text-[16px] font-bold py-3 mt-4"
+              style="background:#0f172a;touch-action:manipulation">📋 一键复制订单并去微信发送</button>
+      <p style="font-size:12px;color:#94a3b8;text-align:center;margin:8px 0 2px">复制后打开微信粘贴发送给店主即可，付款前请与店主确认订单。</p>
+    </div>
+  </div>
+
+  <!-- ============ 进入欢迎提示 ============ -->
+  <div id="welVeil" onclick="closeWelcome()"></div>
+  <div id="welPanel" role="alertdialog" aria-label="欢迎">
+    <div style="font-size:46px;line-height:1">📚</div>
+    <div style="font-size:19px;font-weight:800;color:#1e293b;margin:12px 0 8px">欢迎来到二手书平台</div>
+    <p style="font-size:14px;line-height:1.9;color:#475569;margin:0 auto;max-width:300px">
+      我们这里有丰富的二手书资源，点击搜索想购买的书，下单后添加二维码付款即可送货上门噢！！
+    </p>
+    <button onclick="closeWelcome()"
+            style="width:100%;margin-top:18px;border:none;border-radius:12px;background:#f97316;color:#fff;
+                   font-size:16px;font-weight:700;padding:12px 0;touch-action:manipulation">知道了，开始逛逛</button>
+  </div>
+
+  <!-- ============ Toast ============ -->
+  <div id="toast" role="status"></div>
+
   <script>
-    // ============ 书籍数据（由 booklist.json 生成注入） ============
+    // ============ 书籍数据（由 booklist.json 生成注入，含 price/stock） ============
     const books = __BOOKS_DATA__;
+    books.forEach((b) => {
+      b.price = (Number.isFinite(+b.price) && +b.price >= 0) ? +b.price : 9.9;
+      b.stock = (Number.isInteger(+b.stock) && +b.stock >= 0) ? +b.stock : 1;
+    });
 
-    // ============ 渲染 ============
-    const grid = document.getElementById("bookGrid");
-    const emptyState = document.getElementById("emptyState");
-    const resultInfo = document.getElementById("resultInfo");
+    // TODO: REPLACE_ME 店主微信号 / 联系电话（如需在复制文案里带上，改这里）
+    const STORE_WECHAT = "XXXXX";
 
-    function esc(str) {
-      return String(str ?? "")
-        .replace(/&/g, "&amp;").replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    const $ = (s) => document.querySelector(s);
+    const fmt = (n) => "¥" + (Math.round((+n || 0) * 100) / 100).toFixed(2);
+    const esc = (s) => String(s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    const bookById = (id) => books.find((b) => b.id === Number(id)) || null;
+
+    // ============ Toast ============
+    let toastTimer = null;
+    function toast(msg) {
+      const t = $("#toast");
+      t.textContent = msg;
+      t.classList.add("show");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => t.classList.remove("show"), 2000);
     }
 
-    function cardHtml(book, i) {
+    // ============ 页面滚动锁（lightbox/抽屉/弹窗共用计数） ============
+    let lockN = 0;
+    function lockScroll() { lockN++; document.body.style.overflow = "hidden"; }
+    function unlockScroll() { lockN = Math.max(0, lockN - 1); if (!lockN) document.body.style.overflow = ""; }
+
+    // ============ CartManager：购物车状态 + localStorage 持久化 ============
+    const CART_KEY = "sx_cart_v2";
+    const CartManager = {
+      items: [], // [{ id, qty }]
+
+      load() {
+        try {
+          const raw = JSON.parse(localStorage.getItem(CART_KEY) || "[]");
+          const seen = new Map();
+          raw.forEach((it) => {
+            const b = bookById(it && it.id);
+            if (!b) return;
+            const qty = Math.min(Math.max(1, Math.floor(+it.qty) || 1), Math.max(0, b.stock));
+            if (qty >= 1) seen.set(b.id, { id: b.id, qty });
+          });
+          this.items = [...seen.values()];
+        } catch (e) { this.items = []; }
+        this._save(false);
+      },
+
+      _save(notify = true) {
+        try { localStorage.setItem(CART_KEY, JSON.stringify(this.items)); } catch (e) {}
+        if (typeof refreshCartUI === "function") refreshCartUI();
+        if (notify && typeof cartBump === "function") cartBump();
+      },
+
+      find(id) { return this.items.find((it) => it.id === Number(id)); },
+      getCount() { return this.items.reduce((s, it) => s + it.qty, 0); },
+      getTotal() { return this.items.reduce((s, it) => s + (bookById(it.id)?.price || 0) * it.qty, 0); },
+
+      addToCart(id) {
+        const b = bookById(id);
+        if (!b) return { ok: false, msg: "找不到这本书" };
+        if (b.price <= 0) return { ok: false, msg: "价格面议，暂不可购" };
+        if (b.stock <= 0) return { ok: false, msg: "已售罄" };
+        let it = this.find(id);
+        if (it) {
+          if (it.qty >= b.stock) return { ok: false, msg: "已达库存上限", full: true };
+          it.qty++;
+        } else {
+          this.items.push({ id: Number(id), qty: 1 });
+        }
+        this._save(true);
+        return { ok: true, msg: "已加入购物车 ✓" };
+      },
+
+      removeFromCart(id) {
+        this.items = this.items.filter((it) => it.id !== Number(id));
+        this._save(true);
+      },
+
+      // delta: +1 / -1；到 0 时不自动删，返回 {hitZero:true} 由调用方确认
+      updateQuantity(id, delta) {
+        const it = this.find(id);
+        const b = bookById(id);
+        if (!it || !b) return { hitZero: false };
+        const next = it.qty + delta;
+        if (next <= 0) return { hitZero: true };
+        if (delta > 0 && next > b.stock) { toast("已达库存上限"); return { hitZero: false }; }
+        it.qty = next;
+        this._save(true);
+        return { hitZero: false };
+      },
+
+      clear() { this.items = []; this._save(true); },
+      checkout() { return this.getCount() > 0; }
+    };
+
+    // ============ 全局 UI 刷新（badge + 卡片按钮 + 打开着的面板） ============
+    function refreshAllCardBtns() {
+      if (!grid) return;
+      grid.querySelectorAll("button[data-add]").forEach((b) => {
+        const bk = bookById(Number(b.dataset.add));
+        if (bk) b.outerHTML = addBtnHTML(bk);
+      });
+    }
+    function refreshCartUI() {
+      const n = CartManager.getCount();
+      const badge = $("#cartBadge");
+      badge.style.display = n ? "" : "none";
+      badge.textContent = n;
+      $("#cartTitleCount").textContent = n ? `（共 ${n} 件）` : "";
+      refreshAllCardBtns();
+      if ($("#cartPanel").classList.contains("open")) renderCartList();
+      if ($("#coPanel").classList.contains("open")) renderCheckoutContent(true);
+    }
+    function cartBump() {
+      const f = $("#cartFab");
+      f.classList.remove("bump");
+      void f.offsetWidth;
+      f.classList.add("bump");
+    }
+
+    // ============ 渲染书籍卡片 ============
+    const grid = $("#bookGrid");
+    const emptyState = $("#emptyState");
+    const resultInfo = $("#resultInfo");
+
+    function addBtnHTML(b) {
+      const cur = CartManager.find(b.id);
+      const soldOut = b.stock <= 0;
+      const unpriced = b.price <= 0;
+      if (soldOut || unpriced) {
+        return `<button class="addbtn add-off" disabled>${soldOut ? "已售罄" : "价格面议"}</button>`;
+      }
+      if (!cur) return `<button class="addbtn add-neu" data-add="${b.id}">＋ 加入购物车</button>`;
+      if (cur.qty >= b.stock) {
+        const extra = b.stock > 1 ? `（${cur.qty}/${b.stock}）` : "";
+        return `<button class="addbtn add-full" data-add="${b.id}" data-open-cart="1">✓ 已加购${extra}</button>`;
+      }
+      return `<button class="addbtn add-ing" data-add="${b.id}">＋ 再加一件（已×${cur.qty}）</button>`;
+    }
+
+    function cardHtml(book) {
       const hasCover = typeof book.cover === "string" && book.cover.trim() !== "";
       const titleText = (book.title && book.title.trim()) ? book.title : "（书名待补）";
       const imgHtml = hasCover
@@ -105,28 +393,38 @@
               onerror="this.style.display='none';this.parentElement.querySelector('.cover-fallback').style.display='flex';" />`
         : "";
       const fallbackHtml =
-        `<div class="cover-fallback absolute inset-0 w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-emerald-100 to-emerald-50" style="display:${hasCover ? "none" : "flex"}">
-           <svg class="w-9 h-9 mb-1.5 text-emerald-400" fill="currentColor" viewBox="0 0 24 24">
+        `<div class="cover-fallback absolute inset-0 w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-orange-100 to-orange-50" style="display:${hasCover ? "none" : "flex"}">
+           <svg class="w-9 h-9 mb-1.5 text-orange-400" fill="currentColor" viewBox="0 0 24 24">
              <path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H6.5a2.5 2.5 0 0 0 0 5H20v2H6.5A4.5 4.5 0 0 1 2 20.5v-16zM6.5 4H7v13H6.5a2.49 2.49 0 0 0-.5.05V6.5A2.5 2.5 0 0 1 6.5 4z" opacity=".85"/>
            </svg>
-           <span class="text-[11px] text-emerald-500/70">暂无封面</span>
+           <span class="text-[11px] text-orange-500/70">暂无封面</span>
          </div>`;
       const titleClass = (book.title && book.title.trim()) ? "text-gray-800" : "text-gray-400";
+      const priceHtml = book.price > 0
+        ? `<span class="text-rose-600 font-bold" style="font-size:15px">${fmt(book.price)}</span>`
+        : `<span class="text-gray-400" style="font-size:12px">价格面议</span>`;
+      const stockHtml = book.stock <= 0
+        ? `<span class="text-rose-500" style="font-size:11px">已售罄</span>`
+        : `<span class="text-gray-400" style="font-size:11px">库存：${book.stock}</span>`;
+      const authorHtml = (book.author && book.author.trim())
+        ? `<p class="text-xs text-gray-500 mt-0.5 line-clamp-1">${esc(book.author)}</p>` : "";
       return `
         <article class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden flex flex-col hover:shadow-md transition-shadow">
           <div class="cover relative aspect-[3/4] bg-gray-100">
             ${imgHtml}
             ${fallbackHtml}
           </div>
-          <div class="px-2.5 pt-2 pb-3 flex flex-col flex-1">
+          <div class="px-2.5 pt-2 pb-2.5 flex flex-col flex-1">
             <h3 class="font-semibold text-[15px] leading-snug ${titleClass} line-clamp-2">${esc(titleText)}</h3>
-            ${(book.author && book.author.trim()) ? `<p class="text-xs text-gray-500 mt-1 line-clamp-1">${esc(book.author)}</p>` : ""}
+            ${authorHtml}
+            <div class="flex items-baseline justify-between mt-1.5">${priceHtml}${stockHtml}</div>
+            ${addBtnHTML(book)}
           </div>
         </article>`;
     }
 
     function render(list) {
-      grid.innerHTML = list.map((b, i) => cardHtml(b, i)).join("");
+      grid.innerHTML = list.map((b) => cardHtml(b)).join("");
       const empty = list.length === 0;
       emptyState.classList.toggle("hidden", !empty);
       grid.classList.toggle("hidden", empty);
@@ -134,7 +432,7 @@
     }
 
     // ============ 实时过滤 ============
-    const searchInput = document.getElementById("searchInput");
+    const searchInput = $("#searchInput");
     function applyFilter() {
       const kw = searchInput.value.trim().toLowerCase();
       const filtered = kw
@@ -144,96 +442,231 @@
     }
     searchInput.addEventListener("input", applyFilter);
 
-    // ============ 看大图（点二维码 / 双击封面打开） ============
-    // 打开即整图适配屏幕，不会只显示一部分；双击 1x/2x 切换，放大后可拖动
-    const lightbox = document.getElementById("lightbox");
-    const lbImg = document.getElementById("lightboxImg");
-    let lbZoom = 1, lbX = 0, lbY = 0, lbPointer = null;
-    let lbStartX = 0, lbStartY = 0, lbMoved = false, lastTap = 0;
-
-    function lbApply() {
-      lbImg.style.transform = `translate(${lbX}px, ${lbY}px) scale(${lbZoom})`;
-    }
-    function lbClamp() {
-      const W = lbImg.offsetWidth * lbZoom, H = lbImg.offsetHeight * lbZoom;
-      const vw = lightbox.clientWidth, vh = lightbox.clientHeight;
-      const mx = Math.max(0, (W - vw) / 2), my = Math.max(0, (H - vh) / 2);
-      lbX = Math.max(-mx, Math.min(mx, lbX));
-      lbY = Math.max(-my, Math.min(my, lbY));
-    }
-    function lbReset() {
-      lbZoom = 1; lbX = 0; lbY = 0;
-      lbImg.style.transition = "transform .18s ease";
-      lbApply();
-    }
-    function openLightbox(src, alt) {
-      lbImg.src = src;
-      lbImg.alt = alt || "";
-      lbReset();
-      lightbox.classList.add("open");
-      document.body.style.overflow = "hidden"; // 防止背景滚动
-    }
-    function closeLightbox() {
-      if (!lightbox.classList.contains("open")) return;
-      lightbox.classList.remove("open");
-      lbImg.src = "";
-      document.body.style.overflow = "";
-    }
-
-    // 图片上的触摸/鼠标手势：双击缩放，放大后单指拖动
-    lbImg.addEventListener("pointerdown", (e) => {
-      lbPointer = e.pointerId;
-      lbStartX = e.clientX; lbStartY = e.clientY;
-      lbMoved = false;
-      if (lbZoom > 1) lbImg.setPointerCapture?.(e.pointerId);
-    });
-    lbImg.addEventListener("pointermove", (e) => {
-      if (e.pointerId !== lbPointer || lbZoom <= 1) return;
-      const dx = e.clientX - lbStartX, dy = e.clientY - lbStartY;
-      if (!lbMoved && Math.hypot(dx, dy) < 8) return;
-      lbMoved = true;
-      lbX += dx; lbY += dy;
-      lbStartX = e.clientX; lbStartY = e.clientY;
-      lbClamp();
-      lbImg.style.transition = "none";
-      lbApply();
-    });
-    lbImg.addEventListener("pointerup", (e) => {
-      if (e.pointerId !== lbPointer) return;
-      lbPointer = null;
-      if (lbMoved) return; // 拖动结束，不是点击
-      if (lbZoom > 1) {    // 放大态单击 → 还原 1x
-        lbZoom = 1; lbX = 0; lbY = 0;
-        lbImg.style.transition = "transform .18s ease";
-        lbApply();
+    // ============ 网格事件：加购按钮 + 双击放大 ============
+    grid.addEventListener("click", (e) => {
+      const btn = e.target.closest("button[data-add]");
+      if (!btn) return;
+      const id = Number(btn.dataset.add);
+      const cur = CartManager.find(id);
+      const b = bookById(id);
+      if (btn.dataset.openCart === "1" || (b && cur && b.stock > 0 && cur.qty >= b.stock)) {
+        openCart();
         return;
       }
-      const now = Date.now(); // 1x 态下两次 300ms 内点击 → 放大 2x
-      if (now - lastTap < 300) {
-        lbZoom = 2; lastTap = 0;
-        lbImg.style.transition = "transform .18s ease";
-        lbApply();
-      } else lastTap = now;
+      const r = CartManager.addToCart(id);
+      toast(r.msg);
+      if (r.ok) refreshCartUI();
     });
-    lbImg.addEventListener("pointercancel", () => { lbPointer = null; });
 
-    // 双击封面 → 看大图
+    function openLightbox(src, alt) {
+      const img = $("#lightboxImg");
+      img.src = src;
+      img.alt = alt || "";
+      $("#lightbox").classList.add("open");
+      lockScroll();
+    }
+    function closeLightbox() {
+      const lb = $("#lightbox");
+      if (!lb.classList.contains("open")) return;
+      lb.classList.remove("open");
+      $("#lightboxImg").src = "";
+      unlockScroll();
+    }
     grid.addEventListener("dblclick", (e) => {
       const img = e.target.closest("img[data-zoom]");
       if (img && img.src) openLightbox(img.src, img.alt);
     });
 
-    // 点击顶部二维码 → 页内大图（整张显示，无需手动缩放）
-    document.getElementById("qrBtn").addEventListener("click", () => {
-      openLightbox("二维码.jpg", "咨询/付款二维码");
+    // ============ 购物车抽屉 ============
+    function openCart() {
+      if (!CartManager.getCount()) { toast("购物车空空如也"); return; }
+      renderCartList();
+      $("#cartVeil").classList.add("on");
+      $("#cartPanel").classList.add("open");
+      lockScroll();
+    }
+    function closeCart() {
+      $("#cartPanel").classList.remove("open");
+      $("#cartVeil").classList.remove("on");
+      unlockScroll();
+    }
+
+    function renderCartList() {
+      const box = $("#cartList");
+      if (!CartManager.items.length) {
+        box.innerHTML = `<div style="text-align:center;color:#94a3b8;padding:46px 0;font-size:14px">
+          🛒 购物车还是空的<br><span style="font-size:12px">去挑几本想买的书吧</span></div>`;
+        $("#cartTotal").textContent = fmt(0);
+        return;
+      }
+      box.innerHTML = CartManager.items.map((it) => {
+        const b = bookById(it.id);
+        if (!b) return "";
+        const title = (b.title || "").trim() || "（书名待补）";
+        const author = (b.author || "").trim();
+        const cover = b.cover ? `<img src="${b.cover}" alt="" loading="lazy" />` : "";
+        const atMax = it.qty >= b.stock;
+        return `
+          <div class="cp-item" data-id="${b.id}">
+            ${cover}
+            <div style="flex:1;min-width:0">
+              <div class="it-t line-clamp-1">${esc(title)}</div>
+              <div class="it-p line-clamp-1">${author ? esc(author) : ""} ${fmt(b.price)}/本</div>
+            </div>
+            <div class="qty">
+              <button data-q="-1" data-id="${b.id}" aria-label="减少数量">−</button>
+              <span class="n">${it.qty}</span>
+              <button data-q="1" data-id="${b.id}" aria-label="增加数量" ${atMax ? "disabled" : ""}>＋</button>
+            </div>
+          </div>`;
+      }).join("");
+      $("#cartTotal").textContent = fmt(CartManager.getTotal());
+    }
+
+    // 购物车面板事件（委托）
+    $("#cartList").addEventListener("click", (e) => {
+      const btn = e.target.closest("button[data-q]");
+      if (!btn) return;
+      const id = Number(btn.dataset.id);
+      const it = CartManager.find(id);
+      const b = bookById(id);
+      const delta = Number(btn.dataset.q);
+      if (delta < 0 && it && it.qty <= 1) {
+        // 减到 0 → 询问是否删除
+        const name = (b && b.title) || "该商品";
+        if (confirm(`从购物车移除「${name}」吗？`)) CartManager.removeFromCart(id);
+        return;
+      }
+      const r = CartManager.updateQuantity(id, delta);
+      if (r.hitZero) CartManager.removeFromCart(id);
+    });
+    $("#btnClearCart").addEventListener("click", () => {
+      if (CartManager.getCount() && confirm("确定清空购物车？")) { CartManager.clear(); toast("已清空购物车"); }
+    });
+    $("#btnCheckout").addEventListener("click", () => {
+      if (!CartManager.checkout()) { toast("购物车空空如也"); return; }
+      openCheckout();
+    });
+    $("#cartFab").addEventListener("click", openCart);
+
+    // ============ 结算弹窗 ============
+    function openCheckout() {
+      renderCheckoutContent(false);
+      $("#coVeil").classList.add("on");
+      $("#coPanel").classList.add("open");
+      lockScroll();
+    }
+    function closeCheckout() {
+      $("#coPanel").classList.remove("open");
+      $("#coVeil").classList.remove("on");
+      unlockScroll();
+    }
+    function renderCheckoutContent(keepForm) {
+      const items = CartManager.items;
+      const total = CartManager.getTotal();
+      const count = CartManager.getCount();
+      $("#coCount").textContent = `（共 ${count} 件）`;
+      $("#coTotal").textContent = total.toFixed(2);
+      const box = $("#coItems");
+      if (!items.length) {
+        box.innerHTML = `<div style="text-align:center;color:#94a3b8;padding:26px 0;font-size:13px">没有商品</div>`;
+        return;
+      }
+      box.innerHTML = items.map((it) => {
+        const b = bookById(it.id);
+        if (!b) return "";
+        const title = (b.title || "").trim() || "（书名待补）";
+        const author = (b.author || "").trim();
+        return `<div class="flex items-center justify-between" style="padding:8px 0;border-bottom:1px dashed #f1f5f9">
+          <div style="min-width:0;padding-right:10px">
+            <div style="font-size:13px;font-weight:600;line-height:1.3" class="line-clamp-1">${esc(title)}</div>
+            <div style="font-size:11px;color:#94a3b8">${author ? esc(author) : ""} × ${it.qty}</div>
+          </div>
+          <div style="font-size:13px;font-weight:600;color:#334155;flex:none">${fmt((b.price || 0) * it.qty)}</div>
+        </div>`;
+      }).join("");
+    }
+
+    function buildOrderText() {
+      const name = $("#ckName").value.trim();
+      const phone = $("#ckPhone").value.trim();
+      const addr = $("#ckAddr").value.trim();
+      const L = [];
+      L.push("【二手书订单】");
+      L.push("——— 买家信息 ———");
+      L.push(`姓名：${name || "（未填）"}`);
+      L.push(`手机/微信：${phone || "（未填）"}`);
+      L.push(`收货：${addr || "（未填）"}`);
+      L.push("——— 商品明细 ———");
+      CartManager.items.forEach((it) => {
+        const b = bookById(it.id);
+        if (!b) return;
+        const t = (b.title || "").trim() || "（书名待补）";
+        const au = (b.author || "").trim();
+        L.push(`${it.qty}. ${t}${au ? "（" + au + "）" : ""} × ${it.qty}   ${fmt((b.price || 0) * it.qty)}`);
+      });
+      L.push(`合计：${fmt(CartManager.getTotal())}（共 ${CartManager.getCount()} 件）`);
+      if (STORE_WECHAT && STORE_WECHAT !== "XXXXX") L.push(`店主微信：${STORE_WECHAT}`);
+      L.push("请核对订单无误，确认后再付款，谢谢！");
+      return L.join("\n");
+    }
+
+    // 复制：优先 navigator.clipboard；微信旧内核等不支持时退回 execCommand
+    function copyText(text, okMsg) {
+      function fallback() {
+        const ta = document.createElement("textarea");
+        ta.value = text;
+        ta.style.cssText = "position:fixed;left:-9999px;top:0;opacity:0";
+        document.body.appendChild(ta);
+        ta.focus(); ta.select();
+        let done = false;
+        try { done = document.execCommand("copy"); } catch (e) {}
+        ta.remove();
+        done ? toast(okMsg) : toast("自动复制失败，请长按上面文字手动复制");
+      }
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(text).then(() => toast(okMsg)).catch(fallback);
+      } else {
+        fallback();
+      }
+    }
+
+    $("#btnCopy").addEventListener("click", () => {
+      const name = $("#ckName").value.trim();
+      const phone = $("#ckPhone").value.trim();
+      if (!name) { toast("请填写姓名"); return; }
+      if (!phone) { toast("请填写手机号/微信号"); return; }
+      if (!CartManager.checkout()) { toast("购物车空空如也"); return; }
+      copyText(buildOrderText(), "订单信息已复制！请打开微信发送给店主");
     });
 
+    // ============ 进入欢迎提示框 ============
+    function openWelcome() {
+      $("#welVeil").classList.add("on");
+      $("#welPanel").classList.add("open");
+      lockScroll();
+    }
+    function closeWelcome() {
+      const p = $("#welPanel");
+      if (!p.classList.contains("open")) return;
+      $("#welPanel").classList.remove("open");
+      $("#welVeil").classList.remove("on");
+      unlockScroll();
+    }
+
+    // ============ 按 Esc 关闭最上层弹层 ============
     document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape") closeLightbox();
+      if (e.key !== "Escape") return;
+      if ($("#welPanel").classList.contains("open")) closeWelcome();
+      else if ($("#coPanel").classList.contains("open")) closeCheckout();
+      else if ($("#cartPanel").classList.contains("open")) closeCart();
+      else if ($("#lightbox").classList.contains("open")) closeLightbox();
     });
 
-    // 初次渲染全部
+    // ============ 启动：读购物车 + 渲染全部 + 弹出欢迎提示 ============
+    CartManager.load();
     render(books);
+    openWelcome();
   </script>
 </body>
 </html>

@@ -12,11 +12,16 @@ const list = JSON.parse(fs.readFileSync(path.join(DIR, "booklist.json"), "utf8")
 const safeJson = (v) => JSON.stringify(v).replace(/<\//g, "<\\/");
 
 // ---- 正式页 ----
+// price/stock：取 booklist 每行字段；缺省时兜底为占位 9.9 / 1（可随时改下面常量后重跑）
+const DEF_PRICE = 9.9;
+const DEF_STOCK = 1;
 const books = list.map((b) => ({
   id: b.id,
   title: (b.title || "").trim(),
   author: (b.author || "").trim(),
   cover: b.cover || "",
+  price: Number.isFinite(+b.price) && +b.price >= 0 ? Math.round(+b.price * 100) / 100 : DEF_PRICE,
+  stock: Number.isInteger(+b.stock) && +b.stock >= 0 ? +b.stock : DEF_STOCK,
 }));
 const tpl = fs.readFileSync(path.join(DIR, "index.template.html"), "utf8");
 if (!tpl.includes("__BOOKS_DATA__")) throw new Error("index 模板缺少 __BOOKS_DATA__");

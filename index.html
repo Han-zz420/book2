@@ -13,15 +13,84 @@
     }
     input, textarea { -webkit-user-select: text; user-select: text; }
     input[type="search"]::-webkit-search-cancel-button { -webkit-appearance: none; }
-    /* 看大图遮罩：默认整图适配屏幕；双击 1x/2x 切换；放大后单指拖动看细节 */
-    #lightbox{display:none;position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.92);
-      flex-direction:column;align-items:center;justify-content:center;padding:16px;
-      touch-action:manipulation;overflow:hidden}
+
+    /* ============ 看大图遮罩（双击封面） ============ */
+    #lightbox{display:none;position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.92);
+      flex-direction:column;align-items:center;justify-content:center;padding:16px}
     #lightbox.open{display:flex}
-    #lightbox img{max-width:92vw;max-height:82vh;object-fit:contain;border-radius:6px;
-      box-shadow:0 10px 40px rgba(0,0,0,.5);transform-origin:center center;will-change:transform;
-      user-select:none;-webkit-user-select:none;-webkit-user-drag:none;touch-action:manipulation}
-    #lightbox .cap{margin-top:14px;color:#cbd5e1;font-size:13px;text-align:center;pointer-events:none}
+    #lightbox img{max-width:94vw;max-height:86vh;object-fit:contain;border-radius:6px;box-shadow:0 10px 40px rgba(0,0,0,.5)}
+    #lightbox .cap{margin-top:14px;color:#cbd5e1;font-size:13px;text-align:center}
+
+    /* ============ 加入购物车按钮 ============ */
+    .addbtn{margin-top:8px;width:100%;display:flex;align-items:center;justify-content:center;gap:2px;
+      border-radius:10px;padding:7px 4px;font-size:12px;font-weight:600;line-height:1;
+      touch-action:manipulation;transition:transform .12s ease}
+    .addbtn:active{transform:scale(.96)}
+    .add-neu{background:#fff7ed;color:#c2410c;border:1px solid #fed7aa}
+    .add-ing{background:#ffedd5;color:#c2410c;border:1px solid #fdba74}
+    .add-full{background:#f97316;color:#fff;border:1px solid #f97316}
+    .add-off{background:#f1f5f9;color:#94a3b8;border:1px solid #e2e8f0;cursor:not-allowed}
+
+    /* ============ 通用遮罩 ============ */
+    .veil{position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:80;opacity:0;pointer-events:none;transition:opacity .22s}
+    .veil.on{opacity:1;pointer-events:auto}
+
+    /* ============ 悬浮购物车按钮 ============ */
+    #cartFab{position:fixed;right:16px;bottom:26px;z-index:70;width:56px;height:56px;border-radius:9999px;
+      background:#ffffff;border:1px solid #fdba74;box-shadow:0 6px 22px rgba(0,0,0,.16);
+      display:flex;align-items:center;justify-content:center;font-size:24px;
+      touch-action:manipulation;transition:transform .12s ease}
+    #cartFab:active{transform:scale(.94)}
+    #cartBadge{position:absolute;top:-3px;right:-3px;min-width:19px;height:19px;padding:0 5px;border-radius:9999px;
+      background:#dc2626;color:#fff;font-size:11px;line-height:19px;text-align:center;font-weight:700;
+      box-shadow:0 1px 3px rgba(0,0,0,.25)}
+    #cartFab.bump{animation:pop .35s ease}
+    @keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.18)}100%{transform:scale(1)}}
+
+    /* ============ 购物车右侧抽屉 ============ */
+    #cartPanel{position:fixed;top:0;right:0;bottom:0;width:min(92vw,390px);background:#fff;z-index:85;
+      transform:translateX(102%);transition:transform .28s ease;display:flex;flex-direction:column;
+      box-shadow:-10px 0 34px rgba(0,0,0,.16)}
+    #cartPanel.open{transform:none}
+    .cp-head{display:flex;align-items:center;justify-content:space-between;padding:15px 16px;border-bottom:1px solid #f1f5f9;flex:none}
+    .cp-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:2px 12px}
+    .cp-item{display:flex;gap:10px;align-items:center;padding:11px 2px;border-bottom:1px dashed #eef2f6}
+    .cp-item img{width:44px;height:58px;object-fit:contain;background:#f8fafc;border-radius:4px;flex:none}
+    .cp-item .it-t{font-size:13px;font-weight:600;line-height:1.3}
+    .cp-item .it-p{font-size:12px;color:#94a3b8;margin-top:1px}
+    .qty{display:flex;align-items:center;gap:2px;flex:none}
+    .qty button{width:27px;height:27px;border-radius:7px;border:1px solid #fdba74;background:#fff;color:#ea580c;font-size:15px;
+      line-height:1;display:flex;align-items:center;justify-content:center;touch-action:manipulation}
+    .qty button:active{background:#ffedd5}
+    .qty button:disabled{color:#cbd5e1;border-color:#e2e8f0;background:#f8fafc}
+    .qty .n{min-width:28px;text-align:center;font-size:13px;font-weight:600}
+    .cp-foot{flex:none;padding:12px 14px calc(12px + env(safe-area-inset-bottom));border-top:1px solid #f1f5f9}
+
+    /* ============ 结算弹窗 ============ */
+    #coPanel{position:fixed;left:50%;top:50%;transform:translate(-50%,-47%) scale(.98);width:min(93vw,540px);
+      max-height:92vh;background:#fff;border-radius:16px;z-index:90;display:flex;flex-direction:column;overflow:hidden;
+      opacity:0;pointer-events:none;transition:.22s;box-shadow:0 22px 60px rgba(0,0,0,.32)}
+    #coPanel.open{opacity:1;transform:translate(-50%,-50%);pointer-events:auto}
+    .co-head{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid #f1f5f9;flex:none}
+    .co-body{overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px 18px calc(14px + env(safe-area-inset-bottom))}
+    .co-lab{font-size:12px;color:#64748b;display:block;margin:10px 0 4px}
+    .co-inp{width:100%;border:1px solid #e2e8f0;border-radius:9px;padding:9px 10px;font-size:14px;outline-color:#f97316;
+      background:#f8fafc}
+    .co-inp:focus{background:#fff}
+
+    /* ============ 进入欢迎提示框 ============ */
+    #welPanel{position:fixed;left:50%;top:50%;transform:translate(-50%,-46%) scale(.96);width:min(86vw,400px);
+      background:#fff;border-radius:20px;z-index:120;box-sizing:border-box;padding:26px 22px 20px;text-align:center;
+      opacity:0;pointer-events:none;transition:.25s;box-shadow:0 22px 60px rgba(0,0,0,.32)}
+    #welPanel.open{opacity:1;transform:translate(-50%,-50%);pointer-events:auto}
+    #welVeil{position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:110;opacity:0;pointer-events:none;transition:opacity .22s}
+    #welVeil.on{opacity:1;pointer-events:auto}
+
+    /* ============ Toast 轻提示 ============ */
+    #toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%);z-index:130;
+      background:rgba(17,24,39,.93);color:#fff;padding:9px 17px;border-radius:999px;font-size:13px;line-height:1.4;
+      opacity:0;pointer-events:none;transition:.25s;max-width:86vw;text-align:center}
+    #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
   </style>
 </head>
 <body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col">
@@ -33,15 +102,16 @@
     </div>
 
     <div class="bg-white flex flex-col items-center pt-3 pb-1">
-      <button type="button" id="qrBtn"
-         title="点开查看大图（可长按识别）"
-         class="relative block w-28 h-28 p-0 m-0 bg-white rounded-lg overflow-hidden border border-gray-200 shadow-sm cursor-pointer focus:outline-none">
+      <!-- 不用 <a 新窗口>：否则微信里点开是裸图要拖；且链接会挡长按“识别图中二维码”。点图改走本页全屏 lightbox -->
+      <div onclick="openLightbox('二维码.jpg','咨询 / 付款二维码')"
+         title="点开放大 · 长按识别"
+         class="relative block w-28 h-28 bg-white rounded-lg overflow-hidden border border-gray-200 shadow-sm cursor-pointer">
         <span class="hidden absolute inset-0 items-center justify-center text-gray-400 text-xs pointer-events-none">二维码占位图</span>
         <img src="二维码.jpg" alt="咨询/付款二维码"
              class="absolute inset-0 w-full h-full object-contain p-0.5"
              onerror="this.style.display='none';const s=this.parentElement.querySelector('span');s.classList.remove('hidden');s.classList.add('flex');" />
-      </button>
-      <p class="text-xs text-gray-400 mt-1.5 mb-1">扫码加微信咨询或付款（点图看大图）</p>
+      </div>
+      <p class="text-xs text-gray-400 mt-1.5 mb-1">长按识别 · 点图可放大</p>
     </div>
 
     <div class="bg-white px-4 pb-3">
@@ -50,7 +120,7 @@
           <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M17 10.5a6.5 6.5 0 11-13 0 6.5 6.5 0 0113 0z" />
         </svg>
         <input id="searchInput" type="search" placeholder="搜索书名" autocomplete="off"
-               class="w-full rounded-full border border-emerald-200 bg-emerald-50/60 py-2.5 pl-9 pr-4 text-sm outline-none placeholder-gray-400 focus:bg-white focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100 transition" />
+               class="w-full rounded-full border border-orange-200 bg-orange-50/60 py-2.5 pl-9 pr-4 text-sm outline-none placeholder-gray-400 focus:bg-white focus:border-orange-400 focus:ring-2 focus:ring-orange-100 transition" />
       </div>
     </div>
   </header>
@@ -72,30 +142,248 @@
     © 2026 二手书平台 | 联系微信：XXXXX
   </footer>
 
-  <!-- ============ 看大图遮罩 ============ -->
-  <div id="lightbox" onclick="if(event.target===this)closeLightbox()">
-    <button type="button" onclick="closeLightbox()" aria-label="关闭"
-       class="absolute top-3 right-3 z-10 w-9 h-9 rounded-full bg-white/10 hover:bg-white/25 text-white text-xl leading-none cursor-pointer">✕</button>
-    <img id="lightboxImg" src="" alt="" draggable="false" />
-    <p class="cap">双击放大 / 还原 · 放大后可拖动 · 点 ✕ 或空白关闭</p>
+  <!-- ============ 双击封面看大图 ============ -->
+  <div id="lightbox" onclick="closeLightbox()">
+    <img id="lightboxImg" src="" alt="" />
+    <p class="cap">点击任意处或按 Esc 关闭</p>
   </div>
 
+  <!-- ============ 悬浮购物车按钮 ============ -->
+  <button id="cartFab" aria-label="打开购物车">🛒<span id="cartBadge" style="display:none">0</span></button>
+
+  <!-- ============ 购物车抽屉 ============ -->
+  <div id="cartVeil" class="veil" onclick="closeCart()"></div>
+  <aside id="cartPanel" aria-label="购物车" role="dialog">
+    <div class="cp-head">
+      <h2 class="text-[16px] font-bold" style="margin:0">🛒 购物车<span id="cartTitleCount" style="font-size:13px;color:#94a3b8;font-weight:400"></span></h2>
+      <button onclick="closeCart()" aria-label="关闭"
+              style="border:none;background:none;font-size:20px;color:#64748b;line-height:1;padding:4px">✕</button>
+    </div>
+    <div id="cartList" class="cp-body"></div>
+    <div class="cp-foot">
+      <div class="flex items-center justify-between mb-3">
+        <button id="btnClearCart" style="border:none;background:none;color:#94a3b8;font-size:12px;padding:4px">清空购物车</button>
+        <div style="font-size:13px;color:#64748b">合计：<b id="cartTotal" class="text-rose-600" style="font-size:18px">¥0.00</b></div>
+      </div>
+      <button id="btnCheckout" class="w-full rounded-xl bg-orange-500 text-white text-[16px] font-bold py-3"
+              style="touch-action:manipulation">去结算</button>
+    </div>
+  </aside>
+
+  <!-- ============ 结算弹窗 ============ -->
+  <div id="coVeil" class="veil" onclick="closeCheckout()"></div>
+  <div id="coPanel" role="dialog" aria-label="确认订单">
+    <div class="co-head">
+      <h2 class="text-[16px] font-bold" style="margin:0">📋 确认订单</h2>
+      <button onclick="closeCheckout()" aria-label="关闭"
+              style="border:none;background:none;font-size:20px;color:#64748b;line-height:1;padding:4px">✕</button>
+    </div>
+    <div class="co-body">
+      <!-- 买家信息 -->
+      <div style="font-size:14px;font-weight:700;color:#334155;margin-top:2px">买家信息</div>
+      <label class="co-lab">姓名 *</label>
+      <input id="ckName" class="co-inp" type="text" placeholder="怎么称呼您" autocomplete="name" />
+      <label class="co-lab">手机号 / 微信号 *</label>
+      <input id="ckPhone" class="co-inp" type="tel" placeholder="方便店主联系您" autocomplete="tel" />
+      <label class="co-lab">宿舍 / 收货地址</label>
+      <input id="ckAddr" class="co-inp" type="text" placeholder="如：3 栋 501（可选）" />
+
+      <!-- 订单摘要 -->
+      <div style="font-size:14px;font-weight:700;color:#334155;margin-top:16px">订单摘要 <span id="coCount" style="font-size:12px;color:#94a3b8;font-weight:400"></span></div>
+      <div id="coItems" style="border-top:1px solid #f1f5f9;margin-top:4px"></div>
+
+      <!-- 金额 + 加店主微信 -->
+      <div class="flex items-end justify-between mt-3"
+           style="background:#fff7ed;border:1px solid #fed7aa;border-radius:12px;padding:12px 14px">
+        <div style="font-size:13px;color:#9a3412;line-height:1.6">
+          待确认订单金额<br />
+          <span style="font-size:11px;color:#c2410c">先联系店主确认，再付款</span>
+        </div>
+        <div class="text-rose-600" style="font-size:24px;font-weight:800">¥<span id="coTotal">0.00</span></div>
+      </div>
+
+      <!-- 微信二维码（与顶部同一个联系码） -->
+      <div class="text-center mt-4">
+        <div id="qrWrap" style="width:min(240px,72vw);height:min(240px,72vw);margin:0 auto;background:#fff;border:1px solid #e2e8f0;border-radius:14px;overflow:hidden;position:relative">
+          <!-- TODO: REPLACE_ME 若日后要专用的“店主微信好友码”，替换下方 src 为新的图片文件名即可 -->
+          <img id="ckQr" src="二维码.jpg" alt="店主微信二维码" style="width:100%;height:100%;object-fit:contain;padding:6px"
+               onerror="this.style.display='none';document.getElementById('qrFallback').style.display='flex';" />
+          <span id="qrFallback" style="display:none;position:absolute;inset:0;align-items:center;justify-content:center;color:#94a3b8;font-size:12px">二维码图片缺失<br/>(二维码.jpg)</span>
+        </div>
+        <p class="mt-3 mb-0" style="font-size:14px;font-weight:800;color:#dc2626;line-height:1.6">
+          请长按识别上方二维码添加店主微信，<br />添加后请发送您的订单信息，确认无误后再进行付款！
+        </p>
+      </div>
+
+      <!-- 一键复制 -->
+      <button id="btnCopy" class="w-full rounded-xl text-white text-[16px] font-bold py-3 mt-4"
+              style="background:#0f172a;touch-action:manipulation">📋 一键复制订单并去微信发送</button>
+      <p style="font-size:12px;color:#94a3b8;text-align:center;margin:8px 0 2px">复制后打开微信粘贴发送给店主即可，付款前请与店主确认订单。</p>
+    </div>
+  </div>
+
+  <!-- ============ 进入欢迎提示 ============ -->
+  <div id="welVeil" onclick="closeWelcome()"></div>
+  <div id="welPanel" role="alertdialog" aria-label="欢迎">
+    <div style="font-size:46px;line-height:1">📚</div>
+    <div style="font-size:19px;font-weight:800;color:#1e293b;margin:12px 0 8px">欢迎来到二手书平台</div>
+    <p style="font-size:14px;line-height:1.9;color:#475569;margin:0 auto;max-width:300px">
+      我们这里有丰富的二手书资源，点击搜索想购买的书，下单后添加二维码付款即可送货上门噢！！
+    </p>
+    <button onclick="closeWelcome()"
+            style="width:100%;margin-top:18px;border:none;border-radius:12px;background:#f97316;color:#fff;
+                   font-size:16px;font-weight:700;padding:12px 0;touch-action:manipulation">知道了，开始逛逛</button>
+  </div>
+
+  <!-- ============ Toast ============ -->
+  <div id="toast" role="status"></div>
+
   <script>
-    // ============ 书籍数据（由 booklist.json 生成注入） ============
-    const books = [{"id":1,"title":"机械工程基础","author":"","cover":"covers/IMG_20260831_010109.jpg"},{"id":2,"title":"液压与气动技术","author":"","cover":"covers/IMG_20260831_010117.jpg"},{"id":3,"title":"电机拖动与调速技术","author":"","cover":"covers/IMG_20260831_010120.jpg"},{"id":4,"title":"新能源汽车专业英语","author":"","cover":"covers/IMG_20260831_010127.jpg"},{"id":5,"title":"汽车维修企业管理","author":"","cover":"covers/IMG_20260831_010146.jpg"},{"id":6,"title":"汽车发动机构造","author":"","cover":"covers/IMG_20260831_010152.jpg"},{"id":7,"title":"汽车营销实务","author":"","cover":"covers/IMG_20260831_010155.jpg"},{"id":8,"title":"汽车维修中级工考证训练","author":"","cover":"covers/IMG_20260831_010334.jpg"},{"id":9,"title":"人工智能应用概论","author":"","cover":"covers/IMG_20260831_010557.jpg"},{"id":10,"title":"汽车商务礼仪","author":"","cover":"covers/IMG_20260831_010603.jpg"},{"id":11,"title":"可编程控制器技术","author":"","cover":"covers/IMG_20260831_010611.jpg"},{"id":12,"title":"机械设计基础","author":"","cover":"covers/IMG_20260831_010646.jpg"},{"id":13,"title":"电子技术基础(模拟部分)","author":"","cover":"covers/IMG_20260831_010652.jpg"},{"id":14,"title":"电梯控制技术","author":"","cover":"covers/IMG_20260831_010656.jpg"},{"id":15,"title":"工业控制网络技术","author":"","cover":"covers/IMG_20260831_010700.jpg"},{"id":16,"title":"金工实训","author":"","cover":"covers/IMG_20260831_010711.jpg"},{"id":17,"title":"电工技能实训","author":"","cover":"covers/IMG_20260831_010717.jpg"},{"id":18,"title":"Unity开发标准教程","author":"","cover":"covers/IMG_20260831_010917.jpg"},{"id":19,"title":"传感器应用技术","author":"","cover":"covers/IMG_20260831_010922.jpg"},{"id":20,"title":"建筑工程计量与实践教程","author":"","cover":"covers/IMG_20260831_010924.jpg"},{"id":21,"title":"工程招投标与合同管理","author":"","cover":"covers/IMG_20260831_011015.jpg"},{"id":22,"title":"建筑消防工程","author":"","cover":"covers/IMG_20260831_011021.jpg"},{"id":23,"title":"建筑消防工程","author":"","cover":"covers/IMG_20260831_011027.jpg"},{"id":24,"title":"建筑结构","author":"","cover":"covers/IMG_20260831_011032.jpg"},{"id":25,"title":"建筑工程计量与计价","author":"","cover":"covers/IMG_20260831_011036.jpg"},{"id":26,"title":"安装工程计量与计价","author":"","cover":"covers/IMG_20260831_011041.jpg"},{"id":27,"title":"图形图像处理技术","author":"","cover":"covers/IMG_20260831_011044.jpg"},{"id":28,"title":"模拟电子技术","author":"","cover":"covers/IMG_20260831_011305.jpg"},{"id":29,"title":"电子技术基础(模拟部分)","author":"","cover":"covers/IMG_20260831_011310.jpg"},{"id":30,"title":"金属工艺学","author":"","cover":"covers/IMG_20260831_011312.jpg"},{"id":31,"title":"电子技术基础(学习辅导)","author":"","cover":"covers/IMG_20260831_011415.jpg"},{"id":32,"title":"电子技术基础(数字部分)","author":"","cover":"covers/IMG_20260831_011417.jpg"},{"id":33,"title":"工业机器人数字化建模教程","author":"","cover":"covers/IMG_20260831_011425.jpg"},{"id":34,"title":"mysql数据库基础实例教程","author":"","cover":"covers/IMG_20260831_011550.jpg"},{"id":35,"title":"mysql数据库原理及应用","author":"","cover":"covers/IMG_20260831_011553.jpg"},{"id":36,"title":"mysql数据库基础实例教程","author":"","cover":"covers/IMG_20260831_011558.jpg"},{"id":37,"title":"mysql数据库原理及应用","author":"","cover":"covers/IMG_20260831_011600.jpg"},{"id":38,"title":"三菱FX系列PLC原理及应用","author":"","cover":"covers/IMG_20260831_011605.jpg"},{"id":39,"title":"特种加工技术","author":"","cover":"covers/IMG_20260831_011649.jpg"},{"id":40,"title":"机械产品三模模型设计","author":"","cover":"covers/IMG_20260831_011652.jpg"},{"id":41,"title":"AutoCAD实用教程","author":"","cover":"covers/IMG_20260831_011818.jpg"},{"id":42,"title":"AutoCAD实用教程","author":"","cover":"covers/IMG_20260831_011820.jpg"},{"id":43,"title":"CAD机械设计教程","author":"","cover":"covers/IMG_20260831_011908.jpg"},{"id":44,"title":"计算机绘图","author":"","cover":"covers/IMG_20260831_011910.jpg"},{"id":45,"title":"计算机辅助电路设计","author":"","cover":"covers/IMG_20260831_012003.jpg"},{"id":46,"title":"IT项目管理","author":"","cover":"covers/IMG_20260831_012005.jpg"},{"id":47,"title":"Android移动开发基础","author":"","cover":"covers/IMG_20260831_012053.jpg"},{"id":48,"title":"Android Studio移动应用开发任务教程","author":"","cover":"covers/IMG_20260831_012055.jpg"},{"id":49,"title":"Android移动应用开发基础教程","author":"","cover":"covers/IMG_20260831_012105.jpg"},{"id":50,"title":"android应用开发案例教程","author":"","cover":"covers/IMG_20260831_012117.jpg"},{"id":51,"title":"android应用开发案例教程","author":"","cover":"covers/IMG_20260831_012119.jpg"},{"id":52,"title":"C#与软件项目实训（第2版）","author":"","cover":"covers/IMG_20260831_012422.jpg"},{"id":53,"title":"C语言程序设计项目化教程","author":"","cover":"covers/IMG_20260831_012506.jpg"},{"id":54,"title":"零部件测绘实训指导","author":"","cover":"covers/IMG_20260831_012540.jpg"},{"id":55,"title":"C++程序设计题解与上机指导（第3版）","author":"","cover":"covers/IMG_20260831_012927.jpg"},{"id":56,"title":"Python程序设计项目化教程","author":"","cover":"covers/IMG_20260831_012933.jpg"},{"id":57,"title":"工业机器人离线编程与仿真","author":"","cover":"covers/IMG_20260831_012936.jpg"},{"id":58,"title":"机械制造工艺与机床夹具","author":"","cover":"covers/IMG_20260831_012950.jpg"},{"id":59,"title":"电机与电气控制技术","author":"","cover":"covers/IMG_20260831_012952.jpg"},{"id":60,"title":"原理与系统","author":"","cover":"covers/IMG_20260831_012955.jpg"},{"id":61,"title":"HTML网站设计基础教程","author":"","cover":"covers/IMG_20260831_013000.jpg"},{"id":62,"title":"计算机系统结构","author":"","cover":"covers/IMG_20260831_013007.jpg"},{"id":63,"title":"组态控制技术实训教程","author":"","cover":"covers/IMG_20260831_013014.jpg"},{"id":64,"title":"网络操作系统","author":"","cover":"covers/IMG_20260831_013020.jpg"},{"id":65,"title":"工业机器人虚拟仿真实用教程","author":"","cover":"covers/IMG_20260831_013026.jpg"},{"id":66,"title":"c语言程序设计（第四版）学习辅导","author":"","cover":"covers/IMG_20260831_013051.jpg"},{"id":67,"title":"c语言程序设计","author":"","cover":"covers/IMG_20260831_013134.jpg"},{"id":68,"title":"汽车发动机电控系统检测","author":"","cover":"covers/IMG_20260831_013518.jpg"},{"id":69,"title":"电子电路分析与调试","author":"","cover":"covers/IMG_20260831_013529.jpg"},{"id":70,"title":"工业机器人离线编程与仿真","author":"","cover":"covers/IMG_20260831_013533.jpg"},{"id":71,"title":"新能源汽车电气系统检修","author":"","cover":"covers/IMG_20260831_013536.jpg"},{"id":72,"title":"气压与液压传动","author":"","cover":"covers/IMG_20260831_013546.jpg"},{"id":73,"title":"智能网联汽车","author":"","cover":"covers/IMG_20260831_013550.jpg"},{"id":74,"title":"机械系统设计","author":"","cover":"covers/IMG_20260831_013922.jpg"},{"id":75,"title":"汽车售后服务务实","author":"","cover":"covers/IMG_20260831_013926.jpg"},{"id":76,"title":"新能源汽车概论","author":"","cover":"covers/IMG_20260831_013930.jpg"},{"id":77,"title":"大学物理","author":"","cover":"covers/IMG_20260831_014107.jpg"},{"id":78,"title":"电力电子技术","author":"","cover":"covers/IMG_20260831_014110.jpg"},{"id":79,"title":"金工实训","author":"","cover":"covers/IMG_20260831_014112.jpg"},{"id":80,"title":"数控机床结构与维护","author":"","cover":"covers/IMG_20260831_014114.jpg"},{"id":81,"title":"钳工实习","author":"","cover":"covers/IMG_20260831_014116.jpg"},{"id":82,"title":"机械工程基础","author":"","cover":"covers/IMG_20260831_014118.jpg"},{"id":83,"title":"机械产品数字化设计","author":"","cover":"covers/IMG_20260831_014121.jpg"},{"id":84,"title":"射频识别（RFID）","author":"","cover":"covers/IMG_20260831_014124.jpg"},{"id":85,"title":"机械设计基础(第五版)","author":"","cover":"covers/IMG_20260831_014126.jpg"},{"id":86,"title":"金属工艺学","author":"","cover":"covers/IMG_20260831_014352.jpg"},{"id":87,"title":"《行知行业英语》改编组","author":"","cover":"covers/IMG_20260831_014355.jpg"},{"id":88,"title":"数字李生","author":"","cover":"covers/IMG_20260831_014357.jpg"},{"id":89,"title":"数字孪生产线工艺仿真","author":"","cover":"covers/IMG_20260831_014359.jpg"},{"id":90,"title":"建筑构造","author":"","cover":"covers/IMG_20260831_014403.jpg"},{"id":91,"title":"环境工程原理","author":"","cover":"covers/IMG_20260831_014405.jpg"},{"id":92,"title":"建筑法规概论","author":"","cover":"covers/IMG_20260831_014408.jpg"},{"id":93,"title":"建筑工程施工工艺","author":"","cover":"covers/IMG_20260831_014410.jpg"},{"id":94,"title":"模拟电子技术","author":"","cover":"covers/IMG_20260831_014607.jpg"},{"id":95,"title":"传感器与智能检测技术","author":"","cover":"covers/IMG_20260831_014614.jpg"},{"id":96,"title":"Python程序设计","author":"","cover":"covers/IMG_20260831_014714.jpg"},{"id":97,"title":"python数据分析与应用","author":"","cover":"covers/IMG_20260831_014716.jpg"},{"id":98,"title":"python数据分析与应用","author":"","cover":"covers/IMG_20260831_014718.jpg"},{"id":99,"title":"Python程序设计","author":"","cover":"covers/IMG_20260831_014721.jpg"},{"id":100,"title":"Python编程基础","author":"","cover":"covers/IMG_20260831_014723.jpg"},{"id":101,"title":"多轴数控编程","author":"","cover":"covers/IMG_20260831_014736.jpg"},{"id":102,"title":"solidWprls基础与实例教程","author":"","cover":"covers/IMG_20260831_014852.jpg"},{"id":103,"title":"传感器应用技术","author":"","cover":"covers/IMG_20260831_014856.jpg"},{"id":104,"title":"公差配合与技术测量","author":"","cover":"covers/IMG_20260831_014911.jpg"},{"id":105,"title":"C51单片机应用技术","author":"","cover":"covers/IMG_20260831_015029.jpg"},{"id":106,"title":"Linux操作系统","author":"","cover":"covers/IMG_20260831_015031.jpg"},{"id":107,"title":"SolidWorks2022浦号K东能理","author":"","cover":"covers/IMG_20260831_015132.jpg"},{"id":108,"title":"Auto机械绘图","author":"","cover":"covers/IMG_20260831_015238.jpg"},{"id":109,"title":"机械制图","author":"","cover":"covers/IMG_20260831_015240.jpg"},{"id":110,"title":"机械制图与CAD习题集","author":"","cover":"covers/IMG_20260831_015242.jpg"},{"id":111,"title":"机械制制图与CAD","author":"","cover":"covers/IMG_20260831_015244.jpg"},{"id":112,"title":"AutoCAD机械制图","author":"","cover":"covers/IMG_20260831_015350.jpg"},{"id":113,"title":"AutoCAD2016","author":"","cover":"covers/IMG_20260831_015355.jpg"},{"id":114,"title":"机械制图与CAD","author":"","cover":"covers/IMG_20260831_015357.jpg"},{"id":115,"title":"AutoCAD2018机械产品","author":"","cover":"covers/IMG_20260831_015359.jpg"},{"id":116,"title":"AutoCAD2016绘图教程","author":"","cover":"covers/IMG_20260831_015401.jpg"},{"id":117,"title":"计算机网络技术基础","author":"","cover":"covers/IMG_20260831_015514.jpg"},{"id":118,"title":"C语言程序设计","author":"","cover":"covers/IMG_20260831_015544.jpg"},{"id":119,"title":"Java语言","author":"","cover":"covers/IMG_20260831_015555.jpg"},{"id":120,"title":"Java基础","author":"","cover":"covers/IMG_20260831_015627.jpg"},{"id":121,"title":"JAVA程序设计","author":"","cover":"covers/IMG_20260831_015629.jpg"},{"id":122,"title":"C语言程序设计基础教程","author":"","cover":"covers/IMG_20260831_021603.jpg"},{"id":123,"title":"一传然器技术与点用（第之级）","author":"","cover":"covers/IMG_20260831_021653.jpg"},{"id":124,"title":"高等数学第八版(上册)","author":"","cover":"covers/IMG_20260831_021706.jpg"},{"id":125,"title":"高等数学第八版(下册)","author":"","cover":"covers/IMG_20260831_021708.jpg"},{"id":126,"title":"高等数学第七版(下册)","author":"","cover":"covers/IMG_20260831_021711.jpg"},{"id":127,"title":"传感器技术与应用","author":"","cover":"covers/IMG_20260831_021804.jpg"},{"id":128,"title":"PLC应用与实践","author":"","cover":"covers/IMG_20260831_022209.jpg"},{"id":129,"title":"电路与电工技术","author":"","cover":"covers/IMG_20260831_022212.jpg"},{"id":130,"title":"网络营销","author":"","cover":"covers/IMG_20260831_022214.jpg"},{"id":131,"title":"三维机器设计实训教程","author":"","cover":"covers/IMG_20260831_022216.jpg"},{"id":132,"title":"三维建模项目教程","author":"","cover":"covers/IMG_20260831_022219.jpg"},{"id":133,"title":"无线局域组建与优化","author":"","cover":"covers/IMG_20260831_022224.jpg"},{"id":134,"title":"工业控制网络","author":"","cover":"covers/IMG_20260831_022228.jpg"},{"id":135,"title":"EPLAN电气设计","author":"","cover":"covers/IMG_20260831_022231.jpg"},{"id":136,"title":"工业控制网络","author":"","cover":"covers/IMG_20260831_022236.jpg"},{"id":137,"title":"电梯安全技术","author":"","cover":"covers/IMG_20260831_022600.jpg"},{"id":138,"title":"电梯结构及原理","author":"","cover":"covers/IMG_20260831_022602.jpg"},{"id":139,"title":"电梯营销","author":"","cover":"covers/IMG_20260831_022605.jpg"},{"id":140,"title":"电梯维修与保养","author":"","cover":"covers/IMG_20260831_022609.jpg"},{"id":141,"title":"数字电子技术项目教程","author":"","cover":"covers/IMG_20260831_022612.jpg"},{"id":142,"title":"虚拟仿真与离线编程","author":"","cover":"covers/IMG_20260831_022618.jpg"},{"id":143,"title":"汽车营销","author":"","cover":"covers/IMG_20260831_022621.jpg"},{"id":144,"title":"智能小车系统设计","author":"","cover":"covers/IMG_20260831_022933.jpg"},{"id":145,"title":"电子产品设计","author":"","cover":"covers/IMG_20260831_022935.jpg"},{"id":146,"title":"可编程控制器技术","author":"","cover":"covers/IMG_20260831_022938.jpg"},{"id":147,"title":"传感器应用技术","author":"","cover":"covers/IMG_20260831_022941.jpg"},{"id":148,"title":"汽车售后服务与管理","author":"","cover":"covers/IMG_20260831_022943.jpg"},{"id":149,"title":"嵌人式系统开发","author":"","cover":"covers/IMG_20260831_022949.jpg"},{"id":150,"title":"空侧系统应用","author":"","cover":"covers/IMG_20260831_023107.jpg"},{"id":151,"title":"模具设计基础","author":"","cover":"covers/IMG_20260831_023112.jpg"},{"id":152,"title":"零部件测验实训教程","author":"","cover":"covers/IMG_20260831_023115.jpg"},{"id":153,"title":"PLM技术及应用","author":"","cover":"covers/IMG_20260831_023119.jpg"},{"id":154,"title":"零部件测绘实训指导","author":"","cover":"covers/IMG_20260831_023121.jpg"},{"id":155,"title":"控制系统应用","author":"","cover":"covers/IMG_20260831_023124.jpg"},{"id":156,"title":"汽油发动机电控","author":"","cover":"covers/IMG_20260831_023127.jpg"},{"id":157,"title":"STC单片机","author":"","cover":"covers/IMG_20260831_024053.jpg"},{"id":158,"title":"机械制造基础","author":"","cover":"covers/IMG_20260831_024056.jpg"},{"id":159,"title":"电机与电气","author":"","cover":"covers/IMG_20260831_024100.jpg"},{"id":160,"title":"CApp数字化工艺设计","author":"","cover":"covers/IMG_20260831_024104.jpg"},{"id":161,"title":"原理与系统","author":"","cover":"covers/IMG_20260831_024106.jpg"},{"id":162,"title":"机械制造工艺与机床夹具","author":"","cover":"covers/IMG_20260831_024406.jpg"},{"id":163,"title":"机电产品营销","author":"","cover":"covers/IMG_20260831_024415.jpg"},{"id":164,"title":"机器视觉","author":"","cover":"covers/IMG_20260831_024418.jpg"},{"id":165,"title":"电梯自动控制技术","author":"","cover":"covers/IMG_20260831_024457.jpg"},{"id":166,"title":"传感器原理与应用","author":"","cover":"covers/IMG_20260831_024659.jpg"},{"id":167,"title":"传感器与检测技术","author":"","cover":"covers/IMG_20260831_024705.jpg"},{"id":168,"title":"机械零件三维设计","author":"","cover":"covers/IMG_20260831_024707.jpg"},{"id":169,"title":"混合动力汽车构造与维修","author":"","cover":"covers/IMG_20260831_025028.jpg"},{"id":170,"title":"新能源汽车概论","author":"","cover":"covers/IMG_20260831_025031.jpg"},{"id":171,"title":"纯电动汽车构造与检修","author":"","cover":"covers/IMG_20260831_025033.jpg"},{"id":172,"title":"机械设计基础","author":"","cover":"covers/IMG_20260831_025040.jpg"},{"id":173,"title":"人工智能应用导论","author":"","cover":"covers/IMG_20260831_025058.jpg"},{"id":174,"title":"Linx系统管理及应用","author":"","cover":"covers/IMG_20260831_030422.jpg"},{"id":175,"title":"Linux系统管理及应用","author":"","cover":"covers/IMG_20260831_030430.jpg"},{"id":176,"title":"电机与拖动","author":"","cover":"covers/IMG_20260831_030435.jpg"},{"id":177,"title":"汽车传感器技术","author":"","cover":"covers/IMG_20260831_030504.jpg"},{"id":178,"title":"新能源电气系统检修","author":"","cover":"covers/IMG_20260831_030527.jpg"},{"id":179,"title":"Vue.js前端开发实战","author":"","cover":"covers/IMG_20260831_030623.jpg"},{"id":180,"title":"网页设计与制作","author":"","cover":"covers/IMG_20260831_030626.jpg"},{"id":181,"title":"Vue.js开发教程","author":"","cover":"covers/IMG_20260831_030628.jpg"},{"id":182,"title":"Python语言","author":"","cover":"covers/IMG_20260831_030633.jpg"},{"id":183,"title":"电工基础","author":"","cover":"covers/IMG_20260831_030742.jpg"},{"id":184,"title":"电子技术基础","author":"","cover":"covers/IMG_20260831_030754.jpg"},{"id":185,"title":"电子技术基础","author":"","cover":"covers/IMG_20260831_030758.jpg"},{"id":186,"title":"三维建模实用教程","author":"","cover":"covers/IMG_20260831_030802.jpg"},{"id":187,"title":"模拟电子技术应用","author":"","cover":"covers/IMG_20260831_030950.jpg"},{"id":188,"title":"电工电子技术","author":"","cover":"covers/IMG_20260831_030952.jpg"},{"id":189,"title":"电子技术","author":"","cover":"covers/IMG_20260831_030954.jpg"},{"id":190,"title":"单片机原理实验指导","author":"","cover":"covers/IMG_20260831_031130.jpg"},{"id":191,"title":"电子技术基础","author":"","cover":"covers/IMG_20260831_031221.jpg"},{"id":192,"title":"电工技术基础","author":"","cover":"covers/IMG_20260831_031224.jpg"},{"id":193,"title":"C语言程序设计项目化教程","author":"","cover":"covers/IMG_20260831_031312.jpg"},{"id":194,"title":"工业机械人应用编程","author":"","cover":"covers/IMG_20260831_031348.jpg"},{"id":195,"title":"工业机械人虚拟仿真技术","author":"","cover":"covers/IMG_20260831_031352.jpg"},{"id":196,"title":"机械设计基础和机械识图","author":"","cover":"covers/IMG_20260831_031524.jpg"},{"id":197,"title":"数控加工程序编程及操作","author":"","cover":"covers/IMG_20260831_031643.jpg"},{"id":198,"title":"数字电子技术","author":"","cover":"covers/IMG_20260831_031739.jpg"},{"id":199,"title":"电工技术","author":"","cover":"covers/IMG_20260831_031741.jpg"},{"id":200,"title":"互换性与测量技术基础","author":"","cover":"covers/IMG_20260831_031925.jpg"},{"id":201,"title":"机械原理","author":"","cover":"covers/IMG_20260831_031928.jpg"},{"id":202,"title":"机械制造基础","author":"","cover":"covers/IMG_20260831_031936.jpg"},{"id":203,"title":"机械工程材料","author":"","cover":"covers/IMG_20260831_032036.jpg"},{"id":204,"title":"建筑构造","author":"","cover":"covers/IMG_20260831_032412.jpg"},{"id":205,"title":"酒店英语国际服务文化","author":"","cover":"covers/IMG_20260901_170943.jpg"},{"id":206,"title":"酒店英语","author":"","cover":"covers/IMG_20260901_170951.jpg"},{"id":207,"title":"新视野大学英语2","author":"","cover":"covers/IMG_20260901_171010.jpg"},{"id":208,"title":"新视野大学英语3","author":"","cover":"covers/IMG_20260901_171019.jpg"},{"id":209,"title":"朗文旅游英语","author":"","cover":"covers/IMG_20260901_171029.jpg"},{"id":210,"title":"进阶综合教程","author":"","cover":"covers/IMG_20260901_171033.jpg"},{"id":211,"title":"实用阶梯英语","author":"","cover":"covers/IMG_20260901_171042.jpg"},{"id":212,"title":"新视野大学英语1","author":"","cover":"covers/IMG_20260901_171048.jpg"},{"id":213,"title":"1+X证书制度实用英语交际职业技能等级考试指定教材","author":"","cover":"covers/IMG_20260901_171210.jpg"},{"id":214,"title":"进阶综合教程","author":"","cover":"covers/IMG_20260901_171518.jpg"},{"id":215,"title":"高职国际进阶英语","author":"","cover":"covers/IMG_20260901_171527.jpg"},{"id":216,"title":"食品营养与健康","author":"","cover":"covers/IMG_20260901_171802.jpg"},{"id":217,"title":"旅游英语视听说","author":"","cover":"covers/IMG_20260901_171804.jpg"},{"id":218,"title":"市场调查与分析","author":"","cover":"covers/IMG_20260901_171807.jpg"},{"id":219,"title":"市场调差与分析","author":"","cover":"covers/IMG_20260901_171815.jpg"},{"id":220,"title":"领队英语","author":"","cover":"covers/IMG_20260901_171819.jpg"},{"id":221,"title":"英语泛读","author":"","cover":"covers/IMG_20260901_171825.jpg"},{"id":222,"title":"朗文旅游英语","author":"","cover":"covers/IMG_20260901_171831.jpg"},{"id":223,"title":"领队英语","author":"","cover":"covers/IMG_20260901_171837.jpg"},{"id":224,"title":"会展英语","author":"","cover":"covers/IMG_20260901_171839.jpg"},{"id":225,"title":"国际邮轮服务英语","author":"","cover":"covers/IMG_20260901_171844.jpg"},{"id":226,"title":"英语翻译国导游英语","author":"","cover":"covers/IMG_20260901_171848.jpg"},{"id":227,"title":"新职业英语","author":"","cover":"covers/IMG_20260901_171851.jpg"},{"id":228,"title":"新职业英语","author":"","cover":"covers/IMG_20260901_171858.jpg"},{"id":229,"title":"婴幼儿家园共育","author":"","cover":"covers/IMG_20260901_172151.jpg"},{"id":230,"title":"婴幼儿伤害预防与处理","author":"","cover":"covers/IMG_20260901_172154.jpg"},{"id":231,"title":"婴幼儿发展引导","author":"","cover":"covers/IMG_20260901_172156.jpg"},{"id":232,"title":"婴幼儿心理发展","author":"","cover":"covers/IMG_20260901_172158.jpg"},{"id":233,"title":"幼儿运动组织与指导","author":"","cover":"covers/IMG_20260901_172200.jpg"},{"id":234,"title":"婴幼儿生理基础","author":"","cover":"covers/IMG_20260901_172203.jpg"},{"id":235,"title":"母婴护理","author":"","cover":"covers/IMG_20260901_172205.jpg"},{"id":236,"title":"餐饮服务与管理","author":"","cover":"covers/IMG_20260901_172207.jpg"},{"id":237,"title":"AIGC与新媒体运营技能实战","author":"","cover":"covers/IMG_20260901_172210.jpg"},{"id":238,"title":"统计学","author":"","cover":"covers/IMG_20260901_172212.jpg"},{"id":239,"title":"幼儿照护","author":"","cover":"covers/IMG_20260901_172414.jpg"},{"id":240,"title":"情绪管理","author":"","cover":"covers/IMG_20260901_172417.jpg"},{"id":241,"title":"幼儿照护","author":"","cover":"covers/IMG_20260901_172419.jpg"},{"id":242,"title":"旅游服务礼仪","author":"","cover":"covers/IMG_20260901_172422.jpg"},{"id":243,"title":"酒店OTA平台运营","author":"","cover":"covers/IMG_20260901_172428.jpg"},{"id":244,"title":"酒店OTA平台运营","author":"","cover":"covers/IMG_20260901_172433.jpg"},{"id":245,"title":"酒店数字化运营概论","author":"","cover":"covers/IMG_20260901_172439.jpg"},{"id":246,"title":"市场调查与分析","author":"","cover":"covers/IMG_20260901_172655.jpg"},{"id":247,"title":"咖啡制作与品鉴","author":"","cover":"covers/IMG_20260901_172703.jpg"},{"id":248,"title":"餐饮服务与运营管理","author":"","cover":"covers/IMG_20260901_172711.jpg"},{"id":249,"title":"消费心理学","author":"","cover":"covers/IMG_20260901_172727.jpg"},{"id":250,"title":"商业文化与素养","author":"","cover":"covers/IMG_20260901_172730.jpg"},{"id":251,"title":"现代市场营销","author":"","cover":"covers/IMG_20260901_172734.jpg"},{"id":252,"title":"酒店人力资源管理","author":"","cover":"covers/IMG_20260901_172739.jpg"},{"id":253,"title":"前厅服务与数字化运营","author":"","cover":"covers/IMG_20260901_172743.jpg"},{"id":254,"title":"酒店收益管理","author":"","cover":"covers/IMG_20260901_172753.jpg"},{"id":255,"title":"酒店数字化营销","author":"","cover":"covers/IMG_20260901_172802.jpg"},{"id":256,"title":"艺术启蒙教","author":"","cover":"covers/IMG_20260901_172807.jpg"},{"id":257,"title":"旅游概论","author":"","cover":"covers/IMG_20260901_172815.jpg"},{"id":258,"title":"新媒体运营","author":"","cover":"covers/IMG_20260901_172818.jpg"},{"id":259,"title":"管理学基础","author":"","cover":"covers/IMG_20260901_172820.jpg"},{"id":260,"title":"新媒体传销与运营","author":"","cover":"covers/IMG_20260901_172823.jpg"},{"id":261,"title":"政策与法律法规第八版","author":"","cover":"covers/IMG_20260901_173422.jpg"},{"id":262,"title":"海历史与风士","author":"","cover":"covers/IMG_20260901_173427.jpg"},{"id":263,"title":"新媒体营销","author":"","cover":"covers/IMG_20260901_173430.jpg"},{"id":264,"title":"旅游应用文写作（第二版）","author":"","cover":"covers/IMG_20260901_173432.jpg"},{"id":265,"title":"服务心理学","author":"","cover":"covers/IMG_20260901_173434.jpg"},{"id":266,"title":"葡萄酒文化与风土","author":"","cover":"covers/IMG_20260901_173436.jpg"},{"id":267,"title":"人体工程学","author":"","cover":"covers/IMG_20260901_173438.jpg"},{"id":268,"title":"人体工程学","author":"","cover":"covers/IMG_20260901_173441.jpg"},{"id":269,"title":"地方导游基础知识","author":"","cover":"covers/IMG_20260901_173445.jpg"},{"id":270,"title":"地方导游基础知识","author":"","cover":"covers/IMG_20260901_173447.jpg"},{"id":271,"title":"休闲学概论","author":"","cover":"covers/IMG_20260901_173451.jpg"},{"id":272,"title":"导游业务","author":"","cover":"covers/IMG_20260901_173453.jpg"},{"id":273,"title":"导游业务","author":"","cover":"covers/IMG_20260901_173456.jpg"},{"id":274,"title":"导游业务","author":"","cover":"covers/IMG_20260901_173458.jpg"},{"id":275,"title":"全国导游基础知识","author":"","cover":"covers/IMG_20260901_173502.jpg"},{"id":276,"title":"地方导游基础知识","author":"","cover":"covers/IMG_20260901_173505.jpg"},{"id":277,"title":"地方导游基础知识","author":"","cover":"covers/IMG_20260901_173507.jpg"},{"id":278,"title":"政策与法律法规第七版","author":"","cover":"covers/IMG_20260901_173509.jpg"},{"id":279,"title":"全国导游基础知识","author":"","cover":"covers/IMG_20260901_173511.jpg"},{"id":280,"title":"全国导游基础知识","author":"","cover":"covers/IMG_20260901_173514.jpg"},{"id":281,"title":"政策与法律法规第九版","author":"","cover":"covers/IMG_20260901_173926.jpg"},{"id":282,"title":"会计基础","author":"","cover":"covers/IMG_20260901_174439.jpg"},{"id":283,"title":"立体教学","author":"","cover":"covers/IMG_20260901_174444.jpg"},{"id":284,"title":"保险实务","author":"","cover":"covers/IMG_20260901_174446.jpg"},{"id":285,"title":"茶艺","author":"","cover":"covers/IMG_20260901_174452.jpg"},{"id":286,"title":"旅游市场营销与策划","author":"","cover":"covers/IMG_20260901_174455.jpg"},{"id":287,"title":"旅游市场营销与策划","author":"","cover":"covers/IMG_20260901_174458.jpg"},{"id":288,"title":"旅游心理学","author":"","cover":"covers/IMG_20260901_174502.jpg"},{"id":289,"title":"婴幼儿营养与喂养","author":"","cover":"covers/IMG_20260901_174504.jpg"},{"id":290,"title":"世界几歌钢","author":"","cover":"covers/IMG_20260901_174507.jpg"},{"id":291,"title":"心理行为发展评估","author":"","cover":"covers/IMG_20260901_174509.jpg"},{"id":292,"title":"旅游心理学","author":"","cover":"covers/IMG_20260901_174511.jpg"},{"id":293,"title":"托育机构环境创设","author":"","cover":"covers/IMG_20260901_174523.jpg"},{"id":294,"title":"幼儿游戏活动指导","author":"","cover":"covers/IMG_20260901_174606.jpg"},{"id":295,"title":"舞蹈基础","author":"","cover":"covers/IMG_20260901_174619.jpg"},{"id":296,"title":"总主编马勇","author":"","cover":"covers/IMG_20260901_174908.jpg"},{"id":297,"title":"总主编马勇","author":"","cover":"covers/IMG_20260901_174910.jpg"},{"id":298,"title":"旅游学概论（第二版）","author":"","cover":"covers/IMG_20260901_174913.jpg"},{"id":299,"title":"旅游消费者行为（第三版）","author":"","cover":"covers/IMG_20260901_174915.jpg"},{"id":300,"title":"项目管理","author":"","cover":"covers/IMG_20260901_174919.jpg"},{"id":301,"title":"项目管理","author":"","cover":"covers/IMG_20260901_174921.jpg"},{"id":302,"title":"管理学基础与实务","author":"","cover":"covers/IMG_20260901_174923.jpg"},{"id":303,"title":"现代礼仪训练","author":"","cover":"covers/IMG_20260901_174926.jpg"},{"id":304,"title":"智慧旅游运营实务","author":"","cover":"covers/IMG_20260901_174930.jpg"},{"id":305,"title":"酒水服务","author":"","cover":"covers/IMG_20260901_174932.jpg"},{"id":306,"title":"广东旅游资源概论","author":"","cover":"covers/IMG_20260901_174934.jpg"},{"id":307,"title":"《行知行业英语》改编组","author":"","cover":"covers/IMG_20260901_174936.jpg"},{"id":308,"title":"管理学基础","author":"","cover":"covers/IMG_20260901_174939.jpg"},{"id":309,"title":"市场营销","author":"","cover":"covers/IMG_20260901_174941.jpg"},{"id":310,"title":"世界儿歌钢琴公式化即兴伴","author":"","cover":"covers/IMG_20260901_175042.jpg"},{"id":311,"title":"会展营销","author":"","cover":"covers/IMG_20260901_175344.jpg"},{"id":312,"title":"茶文化","author":"","cover":"covers/IMG_20260901_175349.jpg"},{"id":313,"title":"新媒体营销","author":"","cover":"covers/IMG_20260901_175351.jpg"},{"id":314,"title":"Excel在财务中的应用","author":"","cover":"covers/IMG_20260901_175353.jpg"},{"id":315,"title":"研学旅行指导师实务","author":"","cover":"covers/IMG_20260901_175402.jpg"},{"id":316,"title":"会展设计","author":"","cover":"covers/IMG_20260901_175405.jpg"},{"id":317,"title":"经济学基础","author":"","cover":"covers/IMG_20260901_175409.jpg"},{"id":318,"title":"基础会计","author":"","cover":"covers/IMG_20260901_175416.jpg"},{"id":319,"title":"中国文化概况","author":"","cover":"covers/IMG_20260901_175419.jpg"},{"id":320,"title":"酒店管理概论","author":"","cover":"covers/IMG_20260901_175424.jpg"},{"id":321,"title":"管理学","author":"","cover":"covers/IMG_20260901_175432.jpg"},{"id":322,"title":"会展概论","author":"","cover":"covers/IMG_20260901_175437.jpg"},{"id":323,"title":"基础会计","author":"","cover":"covers/IMG_20260901_175556.jpg"},{"id":324,"title":"市场调查与分析","author":"","cover":"covers/IMG_20260901_175602.jpg"},{"id":325,"title":"经济法基础","author":"","cover":"covers/IMG_20260901_175605.jpg"},{"id":326,"title":"初级会计实务","author":"","cover":"covers/IMG_20260901_175607.jpg"},{"id":327,"title":"初级会计实务考点汇编","author":"","cover":"covers/IMG_20260901_175609.jpg"},{"id":328,"title":"咖啡制作","author":"","cover":"covers/IMG_20260901_175616.jpg"},{"id":329,"title":"形势与政策指导","author":"","cover":"covers/IMG_20260901_175621.jpg"},{"id":330,"title":"岗位知识与专业技能","author":"","cover":"covers/IMG_20260901_175623.jpg"},{"id":331,"title":"中医儿科学","author":"","cover":"covers/IMG_20260901_175720.jpg"},{"id":332,"title":"口才与演讲训练教程","author":"","cover":"covers/IMG_20260901_175724.jpg"},{"id":333,"title":"商务数据分析与应用","author":"","cover":"covers/IMG_20260901_175727.jpg"},{"id":334,"title":"幼儿教师必知礼仪规范与易错细节","author":"","cover":"covers/IMG_20260901_175729.jpg"},{"id":335,"title":"管理学基础与实务","author":"","cover":"covers/IMG_20260901_175736.jpg"},{"id":336,"title":"商务礼仪实务","author":"","cover":"covers/IMG_20260901_175739.jpg"},{"id":337,"title":"建筑绘图教程","author":"","cover":"covers/IMG_20260901_180620.jpg"},{"id":338,"title":"CAD施工图绘制","author":"","cover":"covers/IMG_20260901_180623.jpg"},{"id":339,"title":"新能源汽车电力电子技术","author":"","cover":"covers/IMG_20260901_182048.jpg"},{"id":340,"title":"汽车营销","author":"","cover":"covers/IMG_20260901_182051.jpg"},{"id":341,"title":"汽车营销","author":"","cover":"covers/IMG_20260901_182053.jpg"},{"id":342,"title":"ABB工业机器人","author":"","cover":"covers/IMG_20260901_182055.jpg"},{"id":343,"title":"计算机应用基础案例教程","author":"","cover":"covers/IMG_20260901_182058.jpg"},{"id":344,"title":"汽车机械基础","author":"","cover":"covers/IMG_20260901_182101.jpg"},{"id":345,"title":"Linux编程","author":"","cover":"covers/IMG_20260901_182103.jpg"},{"id":346,"title":"C语言程序设计","author":"","cover":"covers/IMG_20260901_182116.jpg"},{"id":347,"title":"电梯检测技术","author":"","cover":"covers/IMG_20260901_182118.jpg"},{"id":348,"title":"机械制造工艺与机床夹具","author":"","cover":"covers/IMG_20260901_182120.jpg"},{"id":349,"title":"ROS机器人编程零基础","author":"","cover":"covers/IMG_20260901_182123.jpg"},{"id":350,"title":"UGNX12集全实调手册","author":"","cover":"covers/IMG_20260901_182237.jpg"},{"id":351,"title":"新编高等数学","author":"","cover":"covers/IMG_20260901_183459.jpg"},{"id":352,"title":"建筑工程计量与计价实战教程","author":"","cover":"covers/IMG_20260901_183701.jpg"},{"id":353,"title":"高等数学第五版","author":"","cover":"covers/IMG_20260901_192122.jpg"},{"id":354,"title":"应用高等数学","author":"","cover":"covers/IMG_20260901_192224.jpg"},{"id":355,"title":"应用高等数学","author":"","cover":"covers/IMG_20260901_192302.jpg"},{"id":356,"title":"机械制图习题集","author":"","cover":"covers/IMG_20260901_193252.jpg"},{"id":357,"title":"机械制图","author":"","cover":"covers/IMG_20260901_193307.jpg"},{"id":358,"title":"机械设计基础","author":"","cover":"covers/IMG_20260901_193616.jpg"},{"id":359,"title":"机械设计基础课程设计指导书","author":"","cover":"covers/IMG_20260901_193618.jpg"},{"id":360,"title":"机械基础","author":"","cover":"covers/IMG_20260901_193625.jpg"},{"id":361,"title":"机械制图","author":"","cover":"covers/IMG_20260901_193747.jpg"},{"id":362,"title":"保品","author":"","cover":"covers/IMG_20260901_193754.jpg"},{"id":363,"title":"3D打印技术","author":"","cover":"covers/IMG_20260901_193841.jpg"},{"id":364,"title":"工业机器人离线编程(ABB)","author":"","cover":"covers/IMG_20260901_194312.jpg"},{"id":365,"title":"工作站系统集成","author":"","cover":"covers/IMG_20260901_194406.jpg"},{"id":366,"title":"MCGS入版用技","author":"","cover":"covers/IMG_20260901_194435.jpg"},{"id":367,"title":"单片机应用技术","author":"","cover":"covers/IMG_20260901_194710.jpg"},{"id":368,"title":"智能网联汽车概论","author":"","cover":"covers/IMG_20260901_195609.jpg"},{"id":369,"title":"机械零件测绘","author":"","cover":"covers/IMG_20260901_195613.jpg"},{"id":370,"title":"微信小程序开发实战","author":"","cover":"covers/IMG_20260901_195616.jpg"},{"id":371,"title":"建设工程造价控制与管理","author":"","cover":"covers/IMG_20260901_195620.jpg"},{"id":372,"title":"短视频编辑与制作","author":"","cover":"covers/IMG_20260901_195629.jpg"},{"id":373,"title":"短视频","author":"","cover":"covers/IMG_20260901_195633.jpg"},{"id":374,"title":"公差配合与技术测量","author":"","cover":"covers/IMG_20260901_195851.jpg"},{"id":375,"title":"公差配合与技术测量","author":"","cover":"covers/IMG_20260901_195856.jpg"},{"id":376,"title":"液压与气动技术","author":"","cover":"covers/IMG_20260901_200031.jpg"},{"id":377,"title":"区规划设计","author":"","cover":"covers/IMG_20260901_200138.jpg"},{"id":378,"title":"安装工程","author":"","cover":"covers/IMG_20260901_200141.jpg"},{"id":379,"title":"建筑工程招投标与合同管理","author":"","cover":"covers/IMG_20260901_200145.jpg"},{"id":380,"title":"工程经济","author":"","cover":"covers/IMG_20260901_200147.jpg"},{"id":381,"title":"工程招投标与合同管理","author":"","cover":"covers/IMG_20260901_200150.jpg"},{"id":382,"title":"建筑结构造型","author":"","cover":"covers/IMG_20260901_200152.jpg"},{"id":383,"title":"中国建筑史","author":"","cover":"covers/IMG_20260901_200155.jpg"},{"id":384,"title":"住宅建筑设计原理","author":"","cover":"covers/IMG_20260901_200157.jpg"},{"id":385,"title":"外国近现代建筑史","author":"","cover":"covers/IMG_20260901_200159.jpg"},{"id":386,"title":"外国建筑史","author":"","cover":"covers/IMG_20260901_200201.jpg"},{"id":387,"title":"建筑装饰工程施工","author":"","cover":"covers/IMG_20260901_200203.jpg"},{"id":388,"title":"筑粘选型（）","author":"","cover":"covers/IMG_20260901_200305.jpg"},{"id":389,"title":"BIM技术应用","author":"","cover":"covers/IMG_20260901_200414.jpg"},{"id":390,"title":"BIM建筑建模","author":"","cover":"covers/IMG_20260901_200416.jpg"},{"id":391,"title":"BIM技术应用","author":"","cover":"covers/IMG_20260901_200434.jpg"},{"id":392,"title":"市政工程计量与计价","author":"","cover":"covers/IMG_20260901_200443.jpg"},{"id":393,"title":"BIM应用教程：","author":"","cover":"covers/IMG_20260901_200445.jpg"},{"id":394,"title":"市政管道工程施工","author":"","cover":"covers/IMG_20260901_200453.jpg"},{"id":395,"title":"建筑施工组织与管理","author":"","cover":"covers/IMG_20260901_200456.jpg"},{"id":396,"title":"地基与基础工程","author":"","cover":"covers/IMG_20260901_200459.jpg"},{"id":397,"title":"建筑构造","author":"","cover":"covers/IMG_20260901_200819.jpg"},{"id":398,"title":"建设工程法规","author":"","cover":"covers/IMG_20260901_200821.jpg"},{"id":399,"title":"土木工程制图","author":"","cover":"covers/IMG_20260901_200823.jpg"},{"id":400,"title":"大气污染治理技术","author":"","cover":"covers/IMG_20260901_200825.jpg"},{"id":401,"title":"建筑构造","author":"","cover":"covers/IMG_20260901_200830.jpg"},{"id":402,"title":"土木工程制图习题集","author":"","cover":"covers/IMG_20260901_200837.jpg"},{"id":403,"title":"固体废物处理处置","author":"","cover":"covers/IMG_20260901_200839.jpg"},{"id":404,"title":"环境生态学","author":"","cover":"covers/IMG_20260901_200842.jpg"},{"id":405,"title":"环境管理","author":"","cover":"covers/IMG_20260901_200844.jpg"},{"id":406,"title":"环境微生物","author":"","cover":"covers/IMG_20260901_200847.jpg"},{"id":407,"title":"环境监测","author":"","cover":"covers/IMG_20260901_200849.jpg"},{"id":408,"title":"建筑设备识图与","author":"","cover":"covers/IMG_20260901_201617.jpg"},{"id":409,"title":"建筑工程测量","author":"","cover":"covers/IMG_20260901_201622.jpg"},{"id":410,"title":"建筑工程测量(含指导手册)","author":"","cover":"covers/IMG_20260901_201624.jpg"},{"id":411,"title":"建筑施工技术","author":"","cover":"covers/IMG_20260901_201626.jpg"},{"id":412,"title":"安装工程计量与计价","author":"","cover":"covers/IMG_20260901_201629.jpg"},{"id":413,"title":"建设工程法规","author":"","cover":"covers/IMG_20260901_201631.jpg"},{"id":414,"title":"建筑构造","author":"","cover":"covers/IMG_20260901_201634.jpg"},{"id":415,"title":"建筑工程测量（美）","author":"","cover":"covers/IMG_20260901_201804.jpg"},{"id":416,"title":"建筑工程制图","author":"","cover":"covers/IMG_20260901_202635.jpg"},{"id":417,"title":"房屋构成与构造","author":"","cover":"covers/IMG_20260901_202638.jpg"},{"id":418,"title":"钢筋平法试图与计算","author":"","cover":"covers/IMG_20260901_202641.jpg"},{"id":419,"title":"钢筋平法试图与计算","author":"","cover":"covers/IMG_20260901_202644.jpg"},{"id":420,"title":"土力学与地基基础","author":"","cover":"covers/IMG_20260901_202655.jpg"},{"id":421,"title":"建筑力学与结构","author":"","cover":"covers/IMG_20260901_203146.jpg"},{"id":422,"title":"建筑材料","author":"","cover":"covers/IMG_20260901_203150.jpg"},{"id":423,"title":"建筑工程CAD","author":"","cover":"covers/IMG_20260901_203155.jpg"},{"id":424,"title":"装配式混凝土建筑施工","author":"","cover":"covers/IMG_20260901_203159.jpg"},{"id":425,"title":"混凝土建筑施工","author":"","cover":"covers/IMG_20260901_203202.jpg"},{"id":426,"title":"建筑工程测量","author":"","cover":"covers/IMG_20260901_203230.jpg"},{"id":427,"title":"钢结构制作与安装","author":"","cover":"covers/IMG_20260901_203504.jpg"},{"id":428,"title":"建设工程监理","author":"","cover":"covers/IMG_20260901_203506.jpg"},{"id":429,"title":"土力学与地基基础","author":"","cover":"covers/IMG_20260901_203509.jpg"},{"id":430,"title":"建筑材料","author":"","cover":"covers/IMG_20260901_203511.jpg"},{"id":431,"title":"建筑材料","author":"","cover":"covers/IMG_20260901_203515.jpg"},{"id":432,"title":"建筑施工技术","author":"","cover":"covers/IMG_20260901_203814.jpg"},{"id":433,"title":"建筑力学与结构","author":"","cover":"covers/IMG_20260901_203817.jpg"},{"id":434,"title":"钢筋平法识图与算量","author":"","cover":"covers/IMG_20260901_203820.jpg"},{"id":435,"title":"建筑装饰装修工程施工","author":"","cover":"covers/IMG_20260901_203823.jpg"},{"id":436,"title":"钢结构","author":"","cover":"covers/IMG_20260901_203825.jpg"},{"id":437,"title":"钢结构","author":"","cover":"covers/IMG_20260901_203828.jpg"},{"id":438,"title":"建筑施工技术","author":"","cover":"covers/IMG_20260901_203840.jpg"},{"id":439,"title":"建筑施工组织与管理","author":"","cover":"covers/IMG_20260901_204413.jpg"},{"id":440,"title":"建筑材料","author":"","cover":"covers/IMG_20260901_204415.jpg"},{"id":441,"title":"建筑工程经济","author":"","cover":"covers/IMG_20260901_204417.jpg"},{"id":442,"title":"建设工程法规","author":"","cover":"covers/IMG_20260901_204420.jpg"},{"id":443,"title":"建设工程招标投标","author":"","cover":"covers/IMG_20260901_204423.jpg"},{"id":444,"title":"建筑施工组织与管理（第二版）","author":"","cover":"covers/IMG_20260901_204429.jpg"},{"id":445,"title":"UG NX全实例教程","author":"","cover":"covers/IMG_20260901_204746.jpg"},{"id":446,"title":"UG NX入门到精通","author":"","cover":"covers/IMG_20260901_204750.jpg"},{"id":447,"title":"UG NX实例教程","author":"","cover":"covers/IMG_20260901_204753.jpg"},{"id":448,"title":"UG NX12.0数控编程与加工案例教程","author":"","cover":"covers/IMG_20260901_204759.jpg"},{"id":449,"title":"计算机辅助设计","author":"","cover":"covers/IMG_20260901_204801.jpg"},{"id":450,"title":"计算机辅助设计","author":"","cover":"covers/IMG_20260901_204803.jpg"},{"id":451,"title":"UG NX零基础编程","author":"","cover":"covers/IMG_20260901_204807.jpg"},{"id":452,"title":"UGNX数控编程","author":"","cover":"covers/IMG_20260901_204811.jpg"},{"id":453,"title":"三维建模及自动编程","author":"","cover":"covers/IMG_20260901_204814.jpg"},{"id":454,"title":"UG NX数控编程","author":"","cover":"covers/IMG_20260901_204820.jpg"},{"id":455,"title":"UG NX基础教程","author":"","cover":"covers/IMG_20260901_204826.jpg"},{"id":456,"title":"三维建模实用教程","author":"","cover":"covers/IMG_20260901_204829.jpg"},{"id":457,"title":"注塑模具设计","author":"","cover":"covers/IMG_20260901_204835.jpg"},{"id":458,"title":"UGNX10.0案例教程","author":"","cover":"covers/IMG_20260901_204838.jpg"},{"id":459,"title":"气压与液压传动","author":"","cover":"covers/IMG_20260901_204843.jpg"},{"id":460,"title":"实用阶梯英语","author":"","cover":"covers/IMG_20260902_164012.jpg"},{"id":461,"title":"实用阶梯英语","author":"","cover":"covers/IMG_20260902_164022.jpg"},{"id":462,"title":"领队英语","author":"","cover":"covers/IMG_20260902_164200.jpg"},{"id":463,"title":"英语泛读教程","author":"","cover":"covers/IMG_20260902_164206.jpg"},{"id":464,"title":"新媒体技术基础","author":"","cover":"covers/IMG_20260902_164212.jpg"},{"id":465,"title":"新媒体技术应用","author":"","cover":"covers/IMG_20260902_164217.jpg"},{"id":466,"title":"要幼儿音乐启蒙教育","author":"","cover":"covers/IMG_20260902_164248.jpg"},{"id":467,"title":"侍酒服务与管理","author":"","cover":"covers/IMG_20260902_174045.jpg"},{"id":468,"title":"新媒体文案策划与写作","author":"","cover":"covers/IMG_20260902_174554.jpg"},{"id":469,"title":"C语言程序设计项目化教程","author":"","cover":"covers/IMG_20260902_202828.jpg"},{"id":470,"title":"室内装饰工程制图与识图","author":"","cover":"covers/MVIMG_20260831_011005_1788168712266edit.jpg"}];
+    // ============ 书籍数据（由 booklist.json 生成注入，含 price/stock） ============
+    const books = [{"id":1,"title":"机械工程基础","author":"","cover":"covers/IMG_20260831_010109.jpg","price":9.9,"stock":1},{"id":2,"title":"液压与气动技术","author":"","cover":"covers/IMG_20260831_010117.jpg","price":9.9,"stock":1},{"id":3,"title":"电机拖动与调速技术","author":"","cover":"covers/IMG_20260831_010120.jpg","price":9.9,"stock":1},{"id":4,"title":"新能源汽车专业英语","author":"","cover":"covers/IMG_20260831_010127.jpg","price":9.9,"stock":1},{"id":5,"title":"汽车维修企业管理","author":"","cover":"covers/IMG_20260831_010146.jpg","price":9.9,"stock":1},{"id":6,"title":"汽车发动机构造","author":"","cover":"covers/IMG_20260831_010152.jpg","price":9.9,"stock":1},{"id":7,"title":"汽车营销实务","author":"","cover":"covers/IMG_20260831_010155.jpg","price":9.9,"stock":1},{"id":8,"title":"汽车维修中级工考证训练","author":"","cover":"covers/IMG_20260831_010334.jpg","price":9.9,"stock":1},{"id":9,"title":"人工智能应用概论","author":"","cover":"covers/IMG_20260831_010557.jpg","price":9.9,"stock":1},{"id":10,"title":"汽车商务礼仪","author":"","cover":"covers/IMG_20260831_010603.jpg","price":9.9,"stock":1},{"id":11,"title":"可编程控制器技术","author":"","cover":"covers/IMG_20260831_010611.jpg","price":9.9,"stock":1},{"id":12,"title":"机械设计基础","author":"","cover":"covers/IMG_20260831_010646.jpg","price":9.9,"stock":1},{"id":13,"title":"电子技术基础(模拟部分)","author":"","cover":"covers/IMG_20260831_010652.jpg","price":9.9,"stock":1},{"id":14,"title":"电梯控制技术","author":"","cover":"covers/IMG_20260831_010656.jpg","price":9.9,"stock":1},{"id":15,"title":"工业控制网络技术","author":"","cover":"covers/IMG_20260831_010700.jpg","price":9.9,"stock":1},{"id":16,"title":"金工实训","author":"","cover":"covers/IMG_20260831_010711.jpg","price":9.9,"stock":1},{"id":17,"title":"电工技能实训","author":"","cover":"covers/IMG_20260831_010717.jpg","price":9.9,"stock":1},{"id":18,"title":"Unity开发标准教程","author":"","cover":"covers/IMG_20260831_010917.jpg","price":9.9,"stock":1},{"id":19,"title":"传感器应用技术","author":"","cover":"covers/IMG_20260831_010922.jpg","price":9.9,"stock":1},{"id":20,"title":"建筑工程计量与实践教程","author":"","cover":"covers/IMG_20260831_010924.jpg","price":9.9,"stock":1},{"id":21,"title":"工程招投标与合同管理","author":"","cover":"covers/IMG_20260831_011015.jpg","price":9.9,"stock":1},{"id":22,"title":"建筑消防工程","author":"","cover":"covers/IMG_20260831_011021.jpg","price":9.9,"stock":1},{"id":23,"title":"建筑消防工程","author":"","cover":"covers/IMG_20260831_011027.jpg","price":9.9,"stock":1},{"id":24,"title":"建筑结构","author":"","cover":"covers/IMG_20260831_011032.jpg","price":9.9,"stock":1},{"id":25,"title":"建筑工程计量与计价","author":"","cover":"covers/IMG_20260831_011036.jpg","price":9.9,"stock":1},{"id":26,"title":"安装工程计量与计价","author":"","cover":"covers/IMG_20260831_011041.jpg","price":9.9,"stock":1},{"id":27,"title":"图形图像处理技术","author":"","cover":"covers/IMG_20260831_011044.jpg","price":9.9,"stock":1},{"id":28,"title":"模拟电子技术","author":"","cover":"covers/IMG_20260831_011305.jpg","price":9.9,"stock":1},{"id":29,"title":"电子技术基础(模拟部分)","author":"","cover":"covers/IMG_20260831_011310.jpg","price":9.9,"stock":1},{"id":30,"title":"金属工艺学","author":"","cover":"covers/IMG_20260831_011312.jpg","price":9.9,"stock":1},{"id":31,"title":"电子技术基础(学习辅导)","author":"","cover":"covers/IMG_20260831_011415.jpg","price":9.9,"stock":1},{"id":32,"title":"电子技术基础(数字部分)","author":"","cover":"covers/IMG_20260831_011417.jpg","price":9.9,"stock":1},{"id":33,"title":"工业机器人数字化建模教程","author":"","cover":"covers/IMG_20260831_011425.jpg","price":9.9,"stock":1},{"id":34,"title":"mysql数据库基础实例教程","author":"","cover":"covers/IMG_20260831_011550.jpg","price":9.9,"stock":1},{"id":35,"title":"mysql数据库原理及应用","author":"","cover":"covers/IMG_20260831_011553.jpg","price":9.9,"stock":1},{"id":36,"title":"mysql数据库基础实例教程","author":"","cover":"covers/IMG_20260831_011558.jpg","price":9.9,"stock":1},{"id":37,"title":"mysql数据库原理及应用","author":"","cover":"covers/IMG_20260831_011600.jpg","price":9.9,"stock":1},{"id":38,"title":"三菱FX系列PLC原理及应用","author":"","cover":"covers/IMG_20260831_011605.jpg","price":9.9,"stock":1},{"id":39,"title":"特种加工技术","author":"","cover":"covers/IMG_20260831_011649.jpg","price":9.9,"stock":1},{"id":40,"title":"机械产品三模模型设计","author":"","cover":"covers/IMG_20260831_011652.jpg","price":9.9,"stock":1},{"id":41,"title":"AutoCAD实用教程","author":"","cover":"covers/IMG_20260831_011818.jpg","price":9.9,"stock":1},{"id":42,"title":"AutoCAD实用教程","author":"","cover":"covers/IMG_20260831_011820.jpg","price":9.9,"stock":1},{"id":43,"title":"CAD机械设计教程","author":"","cover":"covers/IMG_20260831_011908.jpg","price":9.9,"stock":1},{"id":44,"title":"计算机绘图","author":"","cover":"covers/IMG_20260831_011910.jpg","price":9.9,"stock":1},{"id":45,"title":"计算机辅助电路设计","author":"","cover":"covers/IMG_20260831_012003.jpg","price":9.9,"stock":1},{"id":46,"title":"IT项目管理","author":"","cover":"covers/IMG_20260831_012005.jpg","price":9.9,"stock":1},{"id":47,"title":"Android移动开发基础","author":"","cover":"covers/IMG_20260831_012053.jpg","price":9.9,"stock":1},{"id":48,"title":"Android Studio移动应用开发任务教程","author":"","cover":"covers/IMG_20260831_012055.jpg","price":9.9,"stock":1},{"id":49,"title":"Android移动应用开发基础教程","author":"","cover":"covers/IMG_20260831_012105.jpg","price":9.9,"stock":1},{"id":50,"title":"android应用开发案例教程","author":"","cover":"covers/IMG_20260831_012117.jpg","price":9.9,"stock":1},{"id":51,"title":"android应用开发案例教程","author":"","cover":"covers/IMG_20260831_012119.jpg","price":9.9,"stock":1},{"id":52,"title":"C#与软件项目实训（第2版）","author":"","cover":"covers/IMG_20260831_012422.jpg","price":9.9,"stock":1},{"id":53,"title":"C语言程序设计项目化教程","author":"","cover":"covers/IMG_20260831_012506.jpg","price":9.9,"stock":1},{"id":54,"title":"零部件测绘实训指导","author":"","cover":"covers/IMG_20260831_012540.jpg","price":9.9,"stock":1},{"id":55,"title":"C++程序设计题解与上机指导（第3版）","author":"","cover":"covers/IMG_20260831_012927.jpg","price":9.9,"stock":1},{"id":56,"title":"Python程序设计项目化教程","author":"","cover":"covers/IMG_20260831_012933.jpg","price":9.9,"stock":1},{"id":57,"title":"工业机器人离线编程与仿真","author":"","cover":"covers/IMG_20260831_012936.jpg","price":9.9,"stock":1},{"id":58,"title":"机械制造工艺与机床夹具","author":"","cover":"covers/IMG_20260831_012950.jpg","price":9.9,"stock":1},{"id":59,"title":"电机与电气控制技术","author":"","cover":"covers/IMG_20260831_012952.jpg","price":9.9,"stock":1},{"id":60,"title":"原理与系统","author":"","cover":"covers/IMG_20260831_012955.jpg","price":9.9,"stock":1},{"id":61,"title":"HTML网站设计基础教程","author":"","cover":"covers/IMG_20260831_013000.jpg","price":9.9,"stock":1},{"id":62,"title":"计算机系统结构","author":"","cover":"covers/IMG_20260831_013007.jpg","price":9.9,"stock":1},{"id":63,"title":"组态控制技术实训教程","author":"","cover":"covers/IMG_20260831_013014.jpg","price":9.9,"stock":1},{"id":64,"title":"网络操作系统","author":"","cover":"covers/IMG_20260831_013020.jpg","price":9.9,"stock":1},{"id":65,"title":"工业机器人虚拟仿真实用教程","author":"","cover":"covers/IMG_20260831_013026.jpg","price":9.9,"stock":1},{"id":66,"title":"c语言程序设计（第四版）学习辅导","author":"","cover":"covers/IMG_20260831_013051.jpg","price":9.9,"stock":1},{"id":67,"title":"c语言程序设计","author":"","cover":"covers/IMG_20260831_013134.jpg","price":9.9,"stock":1},{"id":68,"title":"汽车发动机电控系统检测","author":"","cover":"covers/IMG_20260831_013518.jpg","price":9.9,"stock":1},{"id":69,"title":"电子电路分析与调试","author":"","cover":"covers/IMG_20260831_013529.jpg","price":9.9,"stock":1},{"id":70,"title":"工业机器人离线编程与仿真","author":"","cover":"covers/IMG_20260831_013533.jpg","price":9.9,"stock":1},{"id":71,"title":"新能源汽车电气系统检修","author":"","cover":"covers/IMG_20260831_013536.jpg","price":9.9,"stock":1},{"id":72,"title":"气压与液压传动","author":"","cover":"covers/IMG_20260831_013546.jpg","price":9.9,"stock":1},{"id":73,"title":"智能网联汽车","author":"","cover":"covers/IMG_20260831_013550.jpg","price":9.9,"stock":1},{"id":74,"title":"机械系统设计","author":"","cover":"covers/IMG_20260831_013922.jpg","price":9.9,"stock":1},{"id":75,"title":"汽车售后服务务实","author":"","cover":"covers/IMG_20260831_013926.jpg","price":9.9,"stock":1},{"id":76,"title":"新能源汽车概论","author":"","cover":"covers/IMG_20260831_013930.jpg","price":9.9,"stock":1},{"id":77,"title":"大学物理","author":"","cover":"covers/IMG_20260831_014107.jpg","price":9.9,"stock":1},{"id":78,"title":"电力电子技术","author":"","cover":"covers/IMG_20260831_014110.jpg","price":9.9,"stock":1},{"id":79,"title":"金工实训","author":"","cover":"covers/IMG_20260831_014112.jpg","price":9.9,"stock":1},{"id":80,"title":"数控机床结构与维护","author":"","cover":"covers/IMG_20260831_014114.jpg","price":9.9,"stock":1},{"id":81,"title":"钳工实习","author":"","cover":"covers/IMG_20260831_014116.jpg","price":9.9,"stock":1},{"id":82,"title":"机械工程基础","author":"","cover":"covers/IMG_20260831_014118.jpg","price":9.9,"stock":1},{"id":83,"title":"机械产品数字化设计","author":"","cover":"covers/IMG_20260831_014121.jpg","price":9.9,"stock":1},{"id":84,"title":"射频识别（RFID）","author":"","cover":"covers/IMG_20260831_014124.jpg","price":9.9,"stock":1},{"id":85,"title":"机械设计基础(第五版)","author":"","cover":"covers/IMG_20260831_014126.jpg","price":9.9,"stock":1},{"id":86,"title":"金属工艺学","author":"","cover":"covers/IMG_20260831_014352.jpg","price":9.9,"stock":1},{"id":87,"title":"《行知行业英语》改编组","author":"","cover":"covers/IMG_20260831_014355.jpg","price":9.9,"stock":1},{"id":88,"title":"数字李生","author":"","cover":"covers/IMG_20260831_014357.jpg","price":9.9,"stock":1},{"id":89,"title":"数字孪生产线工艺仿真","author":"","cover":"covers/IMG_20260831_014359.jpg","price":9.9,"stock":1},{"id":90,"title":"建筑构造","author":"","cover":"covers/IMG_20260831_014403.jpg","price":9.9,"stock":1},{"id":91,"title":"环境工程原理","author":"","cover":"covers/IMG_20260831_014405.jpg","price":9.9,"stock":1},{"id":92,"title":"建筑法规概论","author":"","cover":"covers/IMG_20260831_014408.jpg","price":9.9,"stock":1},{"id":93,"title":"建筑工程施工工艺","author":"","cover":"covers/IMG_20260831_014410.jpg","price":9.9,"stock":1},{"id":94,"title":"模拟电子技术","author":"","cover":"covers/IMG_20260831_014607.jpg","price":9.9,"stock":1},{"id":95,"title":"传感器与智能检测技术","author":"","cover":"covers/IMG_20260831_014614.jpg","price":9.9,"stock":1},{"id":96,"title":"Python程序设计","author":"","cover":"covers/IMG_20260831_014714.jpg","price":9.9,"stock":1},{"id":97,"title":"python数据分析与应用","author":"","cover":"covers/IMG_20260831_014716.jpg","price":9.9,"stock":1},{"id":98,"title":"python数据分析与应用","author":"","cover":"covers/IMG_20260831_014718.jpg","price":9.9,"stock":1},{"id":99,"title":"Python程序设计","author":"","cover":"covers/IMG_20260831_014721.jpg","price":9.9,"stock":1},{"id":100,"title":"Python编程基础","author":"","cover":"covers/IMG_20260831_014723.jpg","price":9.9,"stock":1},{"id":101,"title":"多轴数控编程","author":"","cover":"covers/IMG_20260831_014736.jpg","price":9.9,"stock":1},{"id":102,"title":"solidWprls基础与实例教程","author":"","cover":"covers/IMG_20260831_014852.jpg","price":9.9,"stock":1},{"id":103,"title":"传感器应用技术","author":"","cover":"covers/IMG_20260831_014856.jpg","price":9.9,"stock":1},{"id":104,"title":"公差配合与技术测量","author":"","cover":"covers/IMG_20260831_014911.jpg","price":9.9,"stock":1},{"id":105,"title":"C51单片机应用技术","author":"","cover":"covers/IMG_20260831_015029.jpg","price":9.9,"stock":1},{"id":106,"title":"Linux操作系统","author":"","cover":"covers/IMG_20260831_015031.jpg","price":9.9,"stock":1},{"id":107,"title":"SolidWorks2022浦号K东能理","author":"","cover":"covers/IMG_20260831_015132.jpg","price":9.9,"stock":1},{"id":108,"title":"Auto机械绘图","author":"","cover":"covers/IMG_20260831_015238.jpg","price":9.9,"stock":1},{"id":109,"title":"机械制图","author":"","cover":"covers/IMG_20260831_015240.jpg","price":9.9,"stock":1},{"id":110,"title":"机械制图与CAD习题集","author":"","cover":"covers/IMG_20260831_015242.jpg","price":9.9,"stock":1},{"id":111,"title":"机械制制图与CAD","author":"","cover":"covers/IMG_20260831_015244.jpg","price":9.9,"stock":1},{"id":112,"title":"AutoCAD机械制图","author":"","cover":"covers/IMG_20260831_015350.jpg","price":9.9,"stock":1},{"id":113,"title":"AutoCAD2016","author":"","cover":"covers/IMG_20260831_015355.jpg","price":9.9,"stock":1},{"id":114,"title":"机械制图与CAD","author":"","cover":"covers/IMG_20260831_015357.jpg","price":9.9,"stock":1},{"id":115,"title":"AutoCAD2018机械产品","author":"","cover":"covers/IMG_20260831_015359.jpg","price":9.9,"stock":1},{"id":116,"title":"AutoCAD2016绘图教程","author":"","cover":"covers/IMG_20260831_015401.jpg","price":9.9,"stock":1},{"id":117,"title":"计算机网络技术基础","author":"","cover":"covers/IMG_20260831_015514.jpg","price":9.9,"stock":1},{"id":118,"title":"C语言程序设计","author":"","cover":"covers/IMG_20260831_015544.jpg","price":9.9,"stock":1},{"id":119,"title":"Java语言","author":"","cover":"covers/IMG_20260831_015555.jpg","price":9.9,"stock":1},{"id":120,"title":"Java基础","author":"","cover":"covers/IMG_20260831_015627.jpg","price":9.9,"stock":1},{"id":121,"title":"JAVA程序设计","author":"","cover":"covers/IMG_20260831_015629.jpg","price":9.9,"stock":1},{"id":122,"title":"C语言程序设计基础教程","author":"","cover":"covers/IMG_20260831_021603.jpg","price":9.9,"stock":1},{"id":123,"title":"一传然器技术与点用（第之级）","author":"","cover":"covers/IMG_20260831_021653.jpg","price":9.9,"stock":1},{"id":124,"title":"高等数学第八版(上册)","author":"","cover":"covers/IMG_20260831_021706.jpg","price":9.9,"stock":1},{"id":125,"title":"高等数学第八版(下册)","author":"","cover":"covers/IMG_20260831_021708.jpg","price":9.9,"stock":1},{"id":126,"title":"高等数学第七版(下册)","author":"","cover":"covers/IMG_20260831_021711.jpg","price":9.9,"stock":1},{"id":127,"title":"传感器技术与应用","author":"","cover":"covers/IMG_20260831_021804.jpg","price":9.9,"stock":1},{"id":128,"title":"PLC应用与实践","author":"","cover":"covers/IMG_20260831_022209.jpg","price":9.9,"stock":1},{"id":129,"title":"电路与电工技术","author":"","cover":"covers/IMG_20260831_022212.jpg","price":9.9,"stock":1},{"id":130,"title":"网络营销","author":"","cover":"covers/IMG_20260831_022214.jpg","price":9.9,"stock":1},{"id":131,"title":"三维机器设计实训教程","author":"","cover":"covers/IMG_20260831_022216.jpg","price":9.9,"stock":1},{"id":132,"title":"三维建模项目教程","author":"","cover":"covers/IMG_20260831_022219.jpg","price":9.9,"stock":1},{"id":133,"title":"无线局域组建与优化","author":"","cover":"covers/IMG_20260831_022224.jpg","price":9.9,"stock":1},{"id":134,"title":"工业控制网络","author":"","cover":"covers/IMG_20260831_022228.jpg","price":9.9,"stock":1},{"id":135,"title":"EPLAN电气设计","author":"","cover":"covers/IMG_20260831_022231.jpg","price":9.9,"stock":1},{"id":136,"title":"工业控制网络","author":"","cover":"covers/IMG_20260831_022236.jpg","price":9.9,"stock":1},{"id":137,"title":"电梯安全技术","author":"","cover":"covers/IMG_20260831_022600.jpg","price":9.9,"stock":1},{"id":138,"title":"电梯结构及原理","author":"","cover":"covers/IMG_20260831_022602.jpg","price":9.9,"stock":1},{"id":139,"title":"电梯营销","author":"","cover":"covers/IMG_20260831_022605.jpg","price":9.9,"stock":1},{"id":140,"title":"电梯维修与保养","author":"","cover":"covers/IMG_20260831_022609.jpg","price":9.9,"stock":1},{"id":141,"title":"数字电子技术项目教程","author":"","cover":"covers/IMG_20260831_022612.jpg","price":9.9,"stock":1},{"id":142,"title":"虚拟仿真与离线编程","author":"","cover":"covers/IMG_20260831_022618.jpg","price":9.9,"stock":1},{"id":143,"title":"汽车营销","author":"","cover":"covers/IMG_20260831_022621.jpg","price":9.9,"stock":1},{"id":144,"title":"智能小车系统设计","author":"","cover":"covers/IMG_20260831_022933.jpg","price":9.9,"stock":1},{"id":145,"title":"电子产品设计","author":"","cover":"covers/IMG_20260831_022935.jpg","price":9.9,"stock":1},{"id":146,"title":"可编程控制器技术","author":"","cover":"covers/IMG_20260831_022938.jpg","price":9.9,"stock":1},{"id":147,"title":"传感器应用技术","author":"","cover":"covers/IMG_20260831_022941.jpg","price":9.9,"stock":1},{"id":148,"title":"汽车售后服务与管理","author":"","cover":"covers/IMG_20260831_022943.jpg","price":9.9,"stock":1},{"id":149,"title":"嵌人式系统开发","author":"","cover":"covers/IMG_20260831_022949.jpg","price":9.9,"stock":1},{"id":150,"title":"空侧系统应用","author":"","cover":"covers/IMG_20260831_023107.jpg","price":9.9,"stock":1},{"id":151,"title":"模具设计基础","author":"","cover":"covers/IMG_20260831_023112.jpg","price":9.9,"stock":1},{"id":152,"title":"零部件测验实训教程","author":"","cover":"covers/IMG_20260831_023115.jpg","price":9.9,"stock":1},{"id":153,"title":"PLM技术及应用","author":"","cover":"covers/IMG_20260831_023119.jpg","price":9.9,"stock":1},{"id":154,"title":"零部件测绘实训指导","author":"","cover":"covers/IMG_20260831_023121.jpg","price":9.9,"stock":1},{"id":155,"title":"控制系统应用","author":"","cover":"covers/IMG_20260831_023124.jpg","price":9.9,"stock":1},{"id":156,"title":"汽油发动机电控","author":"","cover":"covers/IMG_20260831_023127.jpg","price":9.9,"stock":1},{"id":157,"title":"STC单片机","author":"","cover":"covers/IMG_20260831_024053.jpg","price":9.9,"stock":1},{"id":158,"title":"机械制造基础","author":"","cover":"covers/IMG_20260831_024056.jpg","price":9.9,"stock":1},{"id":159,"title":"电机与电气","author":"","cover":"covers/IMG_20260831_024100.jpg","price":9.9,"stock":1},{"id":160,"title":"CApp数字化工艺设计","author":"","cover":"covers/IMG_20260831_024104.jpg","price":9.9,"stock":1},{"id":161,"title":"原理与系统","author":"","cover":"covers/IMG_20260831_024106.jpg","price":9.9,"stock":1},{"id":162,"title":"机械制造工艺与机床夹具","author":"","cover":"covers/IMG_20260831_024406.jpg","price":9.9,"stock":1},{"id":163,"title":"机电产品营销","author":"","cover":"covers/IMG_20260831_024415.jpg","price":9.9,"stock":1},{"id":164,"title":"机器视觉","author":"","cover":"covers/IMG_20260831_024418.jpg","price":9.9,"stock":1},{"id":165,"title":"电梯自动控制技术","author":"","cover":"covers/IMG_20260831_024457.jpg","price":9.9,"stock":1},{"id":166,"title":"传感器原理与应用","author":"","cover":"covers/IMG_20260831_024659.jpg","price":9.9,"stock":1},{"id":167,"title":"传感器与检测技术","author":"","cover":"covers/IMG_20260831_024705.jpg","price":9.9,"stock":1},{"id":168,"title":"机械零件三维设计","author":"","cover":"covers/IMG_20260831_024707.jpg","price":9.9,"stock":1},{"id":169,"title":"混合动力汽车构造与维修","author":"","cover":"covers/IMG_20260831_025028.jpg","price":9.9,"stock":1},{"id":170,"title":"新能源汽车概论","author":"","cover":"covers/IMG_20260831_025031.jpg","price":9.9,"stock":1},{"id":171,"title":"纯电动汽车构造与检修","author":"","cover":"covers/IMG_20260831_025033.jpg","price":9.9,"stock":1},{"id":172,"title":"机械设计基础","author":"","cover":"covers/IMG_20260831_025040.jpg","price":9.9,"stock":1},{"id":173,"title":"人工智能应用导论","author":"","cover":"covers/IMG_20260831_025058.jpg","price":9.9,"stock":1},{"id":174,"title":"Linx系统管理及应用","author":"","cover":"covers/IMG_20260831_030422.jpg","price":9.9,"stock":1},{"id":175,"title":"Linux系统管理及应用","author":"","cover":"covers/IMG_20260831_030430.jpg","price":9.9,"stock":1},{"id":176,"title":"电机与拖动","author":"","cover":"covers/IMG_20260831_030435.jpg","price":9.9,"stock":1},{"id":177,"title":"汽车传感器技术","author":"","cover":"covers/IMG_20260831_030504.jpg","price":9.9,"stock":1},{"id":178,"title":"新能源电气系统检修","author":"","cover":"covers/IMG_20260831_030527.jpg","price":9.9,"stock":1},{"id":179,"title":"Vue.js前端开发实战","author":"","cover":"covers/IMG_20260831_030623.jpg","price":9.9,"stock":1},{"id":180,"title":"网页设计与制作","author":"","cover":"covers/IMG_20260831_030626.jpg","price":9.9,"stock":1},{"id":181,"title":"Vue.js开发教程","author":"","cover":"covers/IMG_20260831_030628.jpg","price":9.9,"stock":1},{"id":182,"title":"Python语言","author":"","cover":"covers/IMG_20260831_030633.jpg","price":9.9,"stock":1},{"id":183,"title":"电工基础","author":"","cover":"covers/IMG_20260831_030742.jpg","price":9.9,"stock":1},{"id":184,"title":"电子技术基础","author":"","cover":"covers/IMG_20260831_030754.jpg","price":9.9,"stock":1},{"id":185,"title":"电子技术基础","author":"","cover":"covers/IMG_20260831_030758.jpg","price":9.9,"stock":1},{"id":186,"title":"三维建模实用教程","author":"","cover":"covers/IMG_20260831_030802.jpg","price":9.9,"stock":1},{"id":187,"title":"模拟电子技术应用","author":"","cover":"covers/IMG_20260831_030950.jpg","price":9.9,"stock":1},{"id":188,"title":"电工电子技术","author":"","cover":"covers/IMG_20260831_030952.jpg","price":9.9,"stock":1},{"id":189,"title":"电子技术","author":"","cover":"covers/IMG_20260831_030954.jpg","price":9.9,"stock":1},{"id":190,"title":"单片机原理实验指导","author":"","cover":"covers/IMG_20260831_031130.jpg","price":9.9,"stock":1},{"id":191,"title":"电子技术基础","author":"","cover":"covers/IMG_20260831_031221.jpg","price":9.9,"stock":1},{"id":192,"title":"电工技术基础","author":"","cover":"covers/IMG_20260831_031224.jpg","price":9.9,"stock":1},{"id":193,"title":"C语言程序设计项目化教程","author":"","cover":"covers/IMG_20260831_031312.jpg","price":9.9,"stock":1},{"id":194,"title":"工业机械人应用编程","author":"","cover":"covers/IMG_20260831_031348.jpg","price":9.9,"stock":1},{"id":195,"title":"工业机械人虚拟仿真技术","author":"","cover":"covers/IMG_20260831_031352.jpg","price":9.9,"stock":1},{"id":196,"title":"机械设计基础和机械识图","author":"","cover":"covers/IMG_20260831_031524.jpg","price":9.9,"stock":1},{"id":197,"title":"数控加工程序编程及操作","author":"","cover":"covers/IMG_20260831_031643.jpg","price":9.9,"stock":1},{"id":198,"title":"数字电子技术","author":"","cover":"covers/IMG_20260831_031739.jpg","price":9.9,"stock":1},{"id":199,"title":"电工技术","author":"","cover":"covers/IMG_20260831_031741.jpg","price":9.9,"stock":1},{"id":200,"title":"互换性与测量技术基础","author":"","cover":"covers/IMG_20260831_031925.jpg","price":9.9,"stock":1},{"id":201,"title":"机械原理","author":"","cover":"covers/IMG_20260831_031928.jpg","price":9.9,"stock":1},{"id":202,"title":"机械制造基础","author":"","cover":"covers/IMG_20260831_031936.jpg","price":9.9,"stock":1},{"id":203,"title":"机械工程材料","author":"","cover":"covers/IMG_20260831_032036.jpg","price":9.9,"stock":1},{"id":204,"title":"建筑构造","author":"","cover":"covers/IMG_20260831_032412.jpg","price":9.9,"stock":1},{"id":205,"title":"酒店英语国际服务文化","author":"","cover":"covers/IMG_20260901_170943.jpg","price":9.9,"stock":1},{"id":206,"title":"酒店英语","author":"","cover":"covers/IMG_20260901_170951.jpg","price":9.9,"stock":1},{"id":207,"title":"新视野大学英语2","author":"","cover":"covers/IMG_20260901_171010.jpg","price":9.9,"stock":1},{"id":208,"title":"新视野大学英语3","author":"","cover":"covers/IMG_20260901_171019.jpg","price":9.9,"stock":1},{"id":209,"title":"朗文旅游英语","author":"","cover":"covers/IMG_20260901_171029.jpg","price":9.9,"stock":1},{"id":210,"title":"进阶综合教程","author":"","cover":"covers/IMG_20260901_171033.jpg","price":9.9,"stock":1},{"id":211,"title":"实用阶梯英语","author":"","cover":"covers/IMG_20260901_171042.jpg","price":9.9,"stock":1},{"id":212,"title":"新视野大学英语1","author":"","cover":"covers/IMG_20260901_171048.jpg","price":9.9,"stock":1},{"id":213,"title":"1+X证书制度实用英语交际职业技能等级考试指定教材","author":"","cover":"covers/IMG_20260901_171210.jpg","price":9.9,"stock":1},{"id":214,"title":"进阶综合教程","author":"","cover":"covers/IMG_20260901_171518.jpg","price":9.9,"stock":1},{"id":215,"title":"高职国际进阶英语","author":"","cover":"covers/IMG_20260901_171527.jpg","price":9.9,"stock":1},{"id":216,"title":"食品营养与健康","author":"","cover":"covers/IMG_20260901_171802.jpg","price":9.9,"stock":1},{"id":217,"title":"旅游英语视听说","author":"","cover":"covers/IMG_20260901_171804.jpg","price":9.9,"stock":1},{"id":218,"title":"市场调查与分析","author":"","cover":"covers/IMG_20260901_171807.jpg","price":9.9,"stock":1},{"id":219,"title":"市场调差与分析","author":"","cover":"covers/IMG_20260901_171815.jpg","price":9.9,"stock":1},{"id":220,"title":"领队英语","author":"","cover":"covers/IMG_20260901_171819.jpg","price":9.9,"stock":1},{"id":221,"title":"英语泛读","author":"","cover":"covers/IMG_20260901_171825.jpg","price":9.9,"stock":1},{"id":222,"title":"朗文旅游英语","author":"","cover":"covers/IMG_20260901_171831.jpg","price":9.9,"stock":1},{"id":223,"title":"领队英语","author":"","cover":"covers/IMG_20260901_171837.jpg","price":9.9,"stock":1},{"id":224,"title":"会展英语","author":"","cover":"covers/IMG_20260901_171839.jpg","price":9.9,"stock":1},{"id":225,"title":"国际邮轮服务英语","author":"","cover":"covers/IMG_20260901_171844.jpg","price":9.9,"stock":1},{"id":226,"title":"英语翻译国导游英语","author":"","cover":"covers/IMG_20260901_171848.jpg","price":9.9,"stock":1},{"id":227,"title":"新职业英语","author":"","cover":"covers/IMG_20260901_171851.jpg","price":9.9,"stock":1},{"id":228,"title":"新职业英语","author":"","cover":"covers/IMG_20260901_171858.jpg","price":9.9,"stock":1},{"id":229,"title":"婴幼儿家园共育","author":"","cover":"covers/IMG_20260901_172151.jpg","price":9.9,"stock":1},{"id":230,"title":"婴幼儿伤害预防与处理","author":"","cover":"covers/IMG_20260901_172154.jpg","price":9.9,"stock":1},{"id":231,"title":"婴幼儿发展引导","author":"","cover":"covers/IMG_20260901_172156.jpg","price":9.9,"stock":1},{"id":232,"title":"婴幼儿心理发展","author":"","cover":"covers/IMG_20260901_172158.jpg","price":9.9,"stock":1},{"id":233,"title":"幼儿运动组织与指导","author":"","cover":"covers/IMG_20260901_172200.jpg","price":9.9,"stock":1},{"id":234,"title":"婴幼儿生理基础","author":"","cover":"covers/IMG_20260901_172203.jpg","price":9.9,"stock":1},{"id":235,"title":"母婴护理","author":"","cover":"covers/IMG_20260901_172205.jpg","price":9.9,"stock":1},{"id":236,"title":"餐饮服务与管理","author":"","cover":"covers/IMG_20260901_172207.jpg","price":9.9,"stock":1},{"id":237,"title":"AIGC与新媒体运营技能实战","author":"","cover":"covers/IMG_20260901_172210.jpg","price":9.9,"stock":1},{"id":238,"title":"统计学","author":"","cover":"covers/IMG_20260901_172212.jpg","price":9.9,"stock":1},{"id":239,"title":"幼儿照护","author":"","cover":"covers/IMG_20260901_172414.jpg","price":9.9,"stock":1},{"id":240,"title":"情绪管理","author":"","cover":"covers/IMG_20260901_172417.jpg","price":9.9,"stock":1},{"id":241,"title":"幼儿照护","author":"","cover":"covers/IMG_20260901_172419.jpg","price":9.9,"stock":1},{"id":242,"title":"旅游服务礼仪","author":"","cover":"covers/IMG_20260901_172422.jpg","price":9.9,"stock":1},{"id":243,"title":"酒店OTA平台运营","author":"","cover":"covers/IMG_20260901_172428.jpg","price":9.9,"stock":1},{"id":244,"title":"酒店OTA平台运营","author":"","cover":"covers/IMG_20260901_172433.jpg","price":9.9,"stock":1},{"id":245,"title":"酒店数字化运营概论","author":"","cover":"covers/IMG_20260901_172439.jpg","price":9.9,"stock":1},{"id":246,"title":"市场调查与分析","author":"","cover":"covers/IMG_20260901_172655.jpg","price":9.9,"stock":1},{"id":247,"title":"咖啡制作与品鉴","author":"","cover":"covers/IMG_20260901_172703.jpg","price":9.9,"stock":1},{"id":248,"title":"餐饮服务与运营管理","author":"","cover":"covers/IMG_20260901_172711.jpg","price":9.9,"stock":1},{"id":249,"title":"消费心理学","author":"","cover":"covers/IMG_20260901_172727.jpg","price":9.9,"stock":1},{"id":250,"title":"商业文化与素养","author":"","cover":"covers/IMG_20260901_172730.jpg","price":9.9,"stock":1},{"id":251,"title":"现代市场营销","author":"","cover":"covers/IMG_20260901_172734.jpg","price":9.9,"stock":1},{"id":252,"title":"酒店人力资源管理","author":"","cover":"covers/IMG_20260901_172739.jpg","price":9.9,"stock":1},{"id":253,"title":"前厅服务与数字化运营","author":"","cover":"covers/IMG_20260901_172743.jpg","price":9.9,"stock":1},{"id":254,"title":"酒店收益管理","author":"","cover":"covers/IMG_20260901_172753.jpg","price":9.9,"stock":1},{"id":255,"title":"酒店数字化营销","author":"","cover":"covers/IMG_20260901_172802.jpg","price":9.9,"stock":1},{"id":256,"title":"艺术启蒙教","author":"","cover":"covers/IMG_20260901_172807.jpg","price":9.9,"stock":1},{"id":257,"title":"旅游概论","author":"","cover":"covers/IMG_20260901_172815.jpg","price":9.9,"stock":1},{"id":258,"title":"新媒体运营","author":"","cover":"covers/IMG_20260901_172818.jpg","price":9.9,"stock":1},{"id":259,"title":"管理学基础","author":"","cover":"covers/IMG_20260901_172820.jpg","price":9.9,"stock":1},{"id":260,"title":"新媒体传销与运营","author":"","cover":"covers/IMG_20260901_172823.jpg","price":9.9,"stock":1},{"id":261,"title":"政策与法律法规第八版","author":"","cover":"covers/IMG_20260901_173422.jpg","price":9.9,"stock":1},{"id":262,"title":"海历史与风士","author":"","cover":"covers/IMG_20260901_173427.jpg","price":9.9,"stock":1},{"id":263,"title":"新媒体营销","author":"","cover":"covers/IMG_20260901_173430.jpg","price":9.9,"stock":1},{"id":264,"title":"旅游应用文写作（第二版）","author":"","cover":"covers/IMG_20260901_173432.jpg","price":9.9,"stock":1},{"id":265,"title":"服务心理学","author":"","cover":"covers/IMG_20260901_173434.jpg","price":9.9,"stock":1},{"id":266,"title":"葡萄酒文化与风土","author":"","cover":"covers/IMG_20260901_173436.jpg","price":9.9,"stock":1},{"id":267,"title":"人体工程学","author":"","cover":"covers/IMG_20260901_173438.jpg","price":9.9,"stock":1},{"id":268,"title":"人体工程学","author":"","cover":"covers/IMG_20260901_173441.jpg","price":9.9,"stock":1},{"id":269,"title":"地方导游基础知识","author":"","cover":"covers/IMG_20260901_173445.jpg","price":9.9,"stock":1},{"id":270,"title":"地方导游基础知识","author":"","cover":"covers/IMG_20260901_173447.jpg","price":9.9,"stock":1},{"id":271,"title":"休闲学概论","author":"","cover":"covers/IMG_20260901_173451.jpg","price":9.9,"stock":1},{"id":272,"title":"导游业务","author":"","cover":"covers/IMG_20260901_173453.jpg","price":9.9,"stock":1},{"id":273,"title":"导游业务","author":"","cover":"covers/IMG_20260901_173456.jpg","price":9.9,"stock":1},{"id":274,"title":"导游业务","author":"","cover":"covers/IMG_20260901_173458.jpg","price":9.9,"stock":1},{"id":275,"title":"全国导游基础知识","author":"","cover":"covers/IMG_20260901_173502.jpg","price":9.9,"stock":1},{"id":276,"title":"地方导游基础知识","author":"","cover":"covers/IMG_20260901_173505.jpg","price":9.9,"stock":1},{"id":277,"title":"地方导游基础知识","author":"","cover":"covers/IMG_20260901_173507.jpg","price":9.9,"stock":1},{"id":278,"title":"政策与法律法规第七版","author":"","cover":"covers/IMG_20260901_173509.jpg","price":9.9,"stock":1},{"id":279,"title":"全国导游基础知识","author":"","cover":"covers/IMG_20260901_173511.jpg","price":9.9,"stock":1},{"id":280,"title":"全国导游基础知识","author":"","cover":"covers/IMG_20260901_173514.jpg","price":9.9,"stock":1},{"id":281,"title":"政策与法律法规第九版","author":"","cover":"covers/IMG_20260901_173926.jpg","price":9.9,"stock":1},{"id":282,"title":"会计基础","author":"","cover":"covers/IMG_20260901_174439.jpg","price":9.9,"stock":1},{"id":283,"title":"立体教学","author":"","cover":"covers/IMG_20260901_174444.jpg","price":9.9,"stock":1},{"id":284,"title":"保险实务","author":"","cover":"covers/IMG_20260901_174446.jpg","price":9.9,"stock":1},{"id":285,"title":"茶艺","author":"","cover":"covers/IMG_20260901_174452.jpg","price":9.9,"stock":1},{"id":286,"title":"旅游市场营销与策划","author":"","cover":"covers/IMG_20260901_174455.jpg","price":9.9,"stock":1},{"id":287,"title":"旅游市场营销与策划","author":"","cover":"covers/IMG_20260901_174458.jpg","price":9.9,"stock":1},{"id":288,"title":"旅游心理学","author":"","cover":"covers/IMG_20260901_174502.jpg","price":9.9,"stock":1},{"id":289,"title":"婴幼儿营养与喂养","author":"","cover":"covers/IMG_20260901_174504.jpg","price":9.9,"stock":1},{"id":290,"title":"世界几歌钢","author":"","cover":"covers/IMG_20260901_174507.jpg","price":9.9,"stock":1},{"id":291,"title":"心理行为发展评估","author":"","cover":"covers/IMG_20260901_174509.jpg","price":9.9,"stock":1},{"id":292,"title":"旅游心理学","author":"","cover":"covers/IMG_20260901_174511.jpg","price":9.9,"stock":1},{"id":293,"title":"托育机构环境创设","author":"","cover":"covers/IMG_20260901_174523.jpg","price":9.9,"stock":1},{"id":294,"title":"幼儿游戏活动指导","author":"","cover":"covers/IMG_20260901_174606.jpg","price":9.9,"stock":1},{"id":295,"title":"舞蹈基础","author":"","cover":"covers/IMG_20260901_174619.jpg","price":9.9,"stock":1},{"id":296,"title":"总主编马勇","author":"","cover":"covers/IMG_20260901_174908.jpg","price":9.9,"stock":1},{"id":297,"title":"总主编马勇","author":"","cover":"covers/IMG_20260901_174910.jpg","price":9.9,"stock":1},{"id":298,"title":"旅游学概论（第二版）","author":"","cover":"covers/IMG_20260901_174913.jpg","price":9.9,"stock":1},{"id":299,"title":"旅游消费者行为（第三版）","author":"","cover":"covers/IMG_20260901_174915.jpg","price":9.9,"stock":1},{"id":300,"title":"项目管理","author":"","cover":"covers/IMG_20260901_174919.jpg","price":9.9,"stock":1},{"id":301,"title":"项目管理","author":"","cover":"covers/IMG_20260901_174921.jpg","price":9.9,"stock":1},{"id":302,"title":"管理学基础与实务","author":"","cover":"covers/IMG_20260901_174923.jpg","price":9.9,"stock":1},{"id":303,"title":"现代礼仪训练","author":"","cover":"covers/IMG_20260901_174926.jpg","price":9.9,"stock":1},{"id":304,"title":"智慧旅游运营实务","author":"","cover":"covers/IMG_20260901_174930.jpg","price":9.9,"stock":1},{"id":305,"title":"酒水服务","author":"","cover":"covers/IMG_20260901_174932.jpg","price":9.9,"stock":1},{"id":306,"title":"广东旅游资源概论","author":"","cover":"covers/IMG_20260901_174934.jpg","price":9.9,"stock":1},{"id":307,"title":"《行知行业英语》改编组","author":"","cover":"covers/IMG_20260901_174936.jpg","price":9.9,"stock":1},{"id":308,"title":"管理学基础","author":"","cover":"covers/IMG_20260901_174939.jpg","price":9.9,"stock":1},{"id":309,"title":"市场营销","author":"","cover":"covers/IMG_20260901_174941.jpg","price":9.9,"stock":1},{"id":310,"title":"世界儿歌钢琴公式化即兴伴","author":"","cover":"covers/IMG_20260901_175042.jpg","price":9.9,"stock":1},{"id":311,"title":"会展营销","author":"","cover":"covers/IMG_20260901_175344.jpg","price":9.9,"stock":1},{"id":312,"title":"茶文化","author":"","cover":"covers/IMG_20260901_175349.jpg","price":9.9,"stock":1},{"id":313,"title":"新媒体营销","author":"","cover":"covers/IMG_20260901_175351.jpg","price":9.9,"stock":1},{"id":314,"title":"Excel在财务中的应用","author":"","cover":"covers/IMG_20260901_175353.jpg","price":9.9,"stock":1},{"id":315,"title":"研学旅行指导师实务","author":"","cover":"covers/IMG_20260901_175402.jpg","price":9.9,"stock":1},{"id":316,"title":"会展设计","author":"","cover":"covers/IMG_20260901_175405.jpg","price":9.9,"stock":1},{"id":317,"title":"经济学基础","author":"","cover":"covers/IMG_20260901_175409.jpg","price":9.9,"stock":1},{"id":318,"title":"基础会计","author":"","cover":"covers/IMG_20260901_175416.jpg","price":9.9,"stock":1},{"id":319,"title":"中国文化概况","author":"","cover":"covers/IMG_20260901_175419.jpg","price":9.9,"stock":1},{"id":320,"title":"酒店管理概论","author":"","cover":"covers/IMG_20260901_175424.jpg","price":9.9,"stock":1},{"id":321,"title":"管理学","author":"","cover":"covers/IMG_20260901_175432.jpg","price":9.9,"stock":1},{"id":322,"title":"会展概论","author":"","cover":"covers/IMG_20260901_175437.jpg","price":9.9,"stock":1},{"id":323,"title":"基础会计","author":"","cover":"covers/IMG_20260901_175556.jpg","price":9.9,"stock":1},{"id":324,"title":"市场调查与分析","author":"","cover":"covers/IMG_20260901_175602.jpg","price":9.9,"stock":1},{"id":325,"title":"经济法基础","author":"","cover":"covers/IMG_20260901_175605.jpg","price":9.9,"stock":1},{"id":326,"title":"初级会计实务","author":"","cover":"covers/IMG_20260901_175607.jpg","price":9.9,"stock":1},{"id":327,"title":"初级会计实务考点汇编","author":"","cover":"covers/IMG_20260901_175609.jpg","price":9.9,"stock":1},{"id":328,"title":"咖啡制作","author":"","cover":"covers/IMG_20260901_175616.jpg","price":9.9,"stock":1},{"id":329,"title":"形势与政策指导","author":"","cover":"covers/IMG_20260901_175621.jpg","price":9.9,"stock":1},{"id":330,"title":"岗位知识与专业技能","author":"","cover":"covers/IMG_20260901_175623.jpg","price":9.9,"stock":1},{"id":331,"title":"中医儿科学","author":"","cover":"covers/IMG_20260901_175720.jpg","price":9.9,"stock":1},{"id":332,"title":"口才与演讲训练教程","author":"","cover":"covers/IMG_20260901_175724.jpg","price":9.9,"stock":1},{"id":333,"title":"商务数据分析与应用","author":"","cover":"covers/IMG_20260901_175727.jpg","price":9.9,"stock":1},{"id":334,"title":"幼儿教师必知礼仪规范与易错细节","author":"","cover":"covers/IMG_20260901_175729.jpg","price":9.9,"stock":1},{"id":335,"title":"管理学基础与实务","author":"","cover":"covers/IMG_20260901_175736.jpg","price":9.9,"stock":1},{"id":336,"title":"商务礼仪实务","author":"","cover":"covers/IMG_20260901_175739.jpg","price":9.9,"stock":1},{"id":337,"title":"建筑绘图教程","author":"","cover":"covers/IMG_20260901_180620.jpg","price":9.9,"stock":1},{"id":338,"title":"CAD施工图绘制","author":"","cover":"covers/IMG_20260901_180623.jpg","price":9.9,"stock":1},{"id":339,"title":"新能源汽车电力电子技术","author":"","cover":"covers/IMG_20260901_182048.jpg","price":9.9,"stock":1},{"id":340,"title":"汽车营销","author":"","cover":"covers/IMG_20260901_182051.jpg","price":9.9,"stock":1},{"id":341,"title":"汽车营销","author":"","cover":"covers/IMG_20260901_182053.jpg","price":9.9,"stock":1},{"id":342,"title":"ABB工业机器人","author":"","cover":"covers/IMG_20260901_182055.jpg","price":9.9,"stock":1},{"id":343,"title":"计算机应用基础案例教程","author":"","cover":"covers/IMG_20260901_182058.jpg","price":9.9,"stock":1},{"id":344,"title":"汽车机械基础","author":"","cover":"covers/IMG_20260901_182101.jpg","price":9.9,"stock":1},{"id":345,"title":"Linux编程","author":"","cover":"covers/IMG_20260901_182103.jpg","price":9.9,"stock":1},{"id":346,"title":"C语言程序设计","author":"","cover":"covers/IMG_20260901_182116.jpg","price":9.9,"stock":1},{"id":347,"title":"电梯检测技术","author":"","cover":"covers/IMG_20260901_182118.jpg","price":9.9,"stock":1},{"id":348,"title":"机械制造工艺与机床夹具","author":"","cover":"covers/IMG_20260901_182120.jpg","price":9.9,"stock":1},{"id":349,"title":"ROS机器人编程零基础","author":"","cover":"covers/IMG_20260901_182123.jpg","price":9.9,"stock":1},{"id":350,"title":"UGNX12集全实调手册","author":"","cover":"covers/IMG_20260901_182237.jpg","price":9.9,"stock":1},{"id":351,"title":"新编高等数学","author":"","cover":"covers/IMG_20260901_183459.jpg","price":9.9,"stock":1},{"id":352,"title":"建筑工程计量与计价实战教程","author":"","cover":"covers/IMG_20260901_183701.jpg","price":9.9,"stock":1},{"id":353,"title":"高等数学第五版","author":"","cover":"covers/IMG_20260901_192122.jpg","price":9.9,"stock":1},{"id":354,"title":"应用高等数学","author":"","cover":"covers/IMG_20260901_192224.jpg","price":9.9,"stock":1},{"id":355,"title":"应用高等数学","author":"","cover":"covers/IMG_20260901_192302.jpg","price":9.9,"stock":1},{"id":356,"title":"机械制图习题集","author":"","cover":"covers/IMG_20260901_193252.jpg","price":9.9,"stock":1},{"id":357,"title":"机械制图","author":"","cover":"covers/IMG_20260901_193307.jpg","price":9.9,"stock":1},{"id":358,"title":"机械设计基础","author":"","cover":"covers/IMG_20260901_193616.jpg","price":9.9,"stock":1},{"id":359,"title":"机械设计基础课程设计指导书","author":"","cover":"covers/IMG_20260901_193618.jpg","price":9.9,"stock":1},{"id":360,"title":"机械基础","author":"","cover":"covers/IMG_20260901_193625.jpg","price":9.9,"stock":1},{"id":361,"title":"机械制图","author":"","cover":"covers/IMG_20260901_193747.jpg","price":9.9,"stock":1},{"id":362,"title":"保品","author":"","cover":"covers/IMG_20260901_193754.jpg","price":9.9,"stock":1},{"id":363,"title":"3D打印技术","author":"","cover":"covers/IMG_20260901_193841.jpg","price":9.9,"stock":1},{"id":364,"title":"工业机器人离线编程(ABB)","author":"","cover":"covers/IMG_20260901_194312.jpg","price":9.9,"stock":1},{"id":365,"title":"工作站系统集成","author":"","cover":"covers/IMG_20260901_194406.jpg","price":9.9,"stock":1},{"id":366,"title":"MCGS入版用技","author":"","cover":"covers/IMG_20260901_194435.jpg","price":9.9,"stock":1},{"id":367,"title":"单片机应用技术","author":"","cover":"covers/IMG_20260901_194710.jpg","price":9.9,"stock":1},{"id":368,"title":"智能网联汽车概论","author":"","cover":"covers/IMG_20260901_195609.jpg","price":9.9,"stock":1},{"id":369,"title":"机械零件测绘","author":"","cover":"covers/IMG_20260901_195613.jpg","price":9.9,"stock":1},{"id":370,"title":"微信小程序开发实战","author":"","cover":"covers/IMG_20260901_195616.jpg","price":9.9,"stock":1},{"id":371,"title":"建设工程造价控制与管理","author":"","cover":"covers/IMG_20260901_195620.jpg","price":9.9,"stock":1},{"id":372,"title":"短视频编辑与制作","author":"","cover":"covers/IMG_20260901_195629.jpg","price":9.9,"stock":1},{"id":373,"title":"短视频","author":"","cover":"covers/IMG_20260901_195633.jpg","price":9.9,"stock":1},{"id":374,"title":"公差配合与技术测量","author":"","cover":"covers/IMG_20260901_195851.jpg","price":9.9,"stock":1},{"id":375,"title":"公差配合与技术测量","author":"","cover":"covers/IMG_20260901_195856.jpg","price":9.9,"stock":1},{"id":376,"title":"液压与气动技术","author":"","cover":"covers/IMG_20260901_200031.jpg","price":9.9,"stock":1},{"id":377,"title":"区规划设计","author":"","cover":"covers/IMG_20260901_200138.jpg","price":9.9,"stock":1},{"id":378,"title":"安装工程","author":"","cover":"covers/IMG_20260901_200141.jpg","price":9.9,"stock":1},{"id":379,"title":"建筑工程招投标与合同管理","author":"","cover":"covers/IMG_20260901_200145.jpg","price":9.9,"stock":1},{"id":380,"title":"工程经济","author":"","cover":"covers/IMG_20260901_200147.jpg","price":9.9,"stock":1},{"id":381,"title":"工程招投标与合同管理","author":"","cover":"covers/IMG_20260901_200150.jpg","price":9.9,"stock":1},{"id":382,"title":"建筑结构造型","author":"","cover":"covers/IMG_20260901_200152.jpg","price":9.9,"stock":1},{"id":383,"title":"中国建筑史","author":"","cover":"covers/IMG_20260901_200155.jpg","price":9.9,"stock":1},{"id":384,"title":"住宅建筑设计原理","author":"","cover":"covers/IMG_20260901_200157.jpg","price":9.9,"stock":1},{"id":385,"title":"外国近现代建筑史","author":"","cover":"covers/IMG_20260901_200159.jpg","price":9.9,"stock":1},{"id":386,"title":"外国建筑史","author":"","cover":"covers/IMG_20260901_200201.jpg","price":9.9,"stock":1},{"id":387,"title":"建筑装饰工程施工","author":"","cover":"covers/IMG_20260901_200203.jpg","price":9.9,"stock":1},{"id":388,"title":"筑粘选型（）","author":"","cover":"covers/IMG_20260901_200305.jpg","price":9.9,"stock":1},{"id":389,"title":"BIM技术应用","author":"","cover":"covers/IMG_20260901_200414.jpg","price":9.9,"stock":1},{"id":390,"title":"BIM建筑建模","author":"","cover":"covers/IMG_20260901_200416.jpg","price":9.9,"stock":1},{"id":391,"title":"BIM技术应用","author":"","cover":"covers/IMG_20260901_200434.jpg","price":9.9,"stock":1},{"id":392,"title":"市政工程计量与计价","author":"","cover":"covers/IMG_20260901_200443.jpg","price":9.9,"stock":1},{"id":393,"title":"BIM应用教程：","author":"","cover":"covers/IMG_20260901_200445.jpg","price":9.9,"stock":1},{"id":394,"title":"市政管道工程施工","author":"","cover":"covers/IMG_20260901_200453.jpg","price":9.9,"stock":1},{"id":395,"title":"建筑施工组织与管理","author":"","cover":"covers/IMG_20260901_200456.jpg","price":9.9,"stock":1},{"id":396,"title":"地基与基础工程","author":"","cover":"covers/IMG_20260901_200459.jpg","price":9.9,"stock":1},{"id":397,"title":"建筑构造","author":"","cover":"covers/IMG_20260901_200819.jpg","price":9.9,"stock":1},{"id":398,"title":"建设工程法规","author":"","cover":"covers/IMG_20260901_200821.jpg","price":9.9,"stock":1},{"id":399,"title":"土木工程制图","author":"","cover":"covers/IMG_20260901_200823.jpg","price":9.9,"stock":1},{"id":400,"title":"大气污染治理技术","author":"","cover":"covers/IMG_20260901_200825.jpg","price":9.9,"stock":1},{"id":401,"title":"建筑构造","author":"","cover":"covers/IMG_20260901_200830.jpg","price":9.9,"stock":1},{"id":402,"title":"土木工程制图习题集","author":"","cover":"covers/IMG_20260901_200837.jpg","price":9.9,"stock":1},{"id":403,"title":"固体废物处理处置","author":"","cover":"covers/IMG_20260901_200839.jpg","price":9.9,"stock":1},{"id":404,"title":"环境生态学","author":"","cover":"covers/IMG_20260901_200842.jpg","price":9.9,"stock":1},{"id":405,"title":"环境管理","author":"","cover":"covers/IMG_20260901_200844.jpg","price":9.9,"stock":1},{"id":406,"title":"环境微生物","author":"","cover":"covers/IMG_20260901_200847.jpg","price":9.9,"stock":1},{"id":407,"title":"环境监测","author":"","cover":"covers/IMG_20260901_200849.jpg","price":9.9,"stock":1},{"id":408,"title":"建筑设备识图与","author":"","cover":"covers/IMG_20260901_201617.jpg","price":9.9,"stock":1},{"id":409,"title":"建筑工程测量","author":"","cover":"covers/IMG_20260901_201622.jpg","price":9.9,"stock":1},{"id":410,"title":"建筑工程测量(含指导手册)","author":"","cover":"covers/IMG_20260901_201624.jpg","price":9.9,"stock":1},{"id":411,"title":"建筑施工技术","author":"","cover":"covers/IMG_20260901_201626.jpg","price":9.9,"stock":1},{"id":412,"title":"安装工程计量与计价","author":"","cover":"covers/IMG_20260901_201629.jpg","price":9.9,"stock":1},{"id":413,"title":"建设工程法规","author":"","cover":"covers/IMG_20260901_201631.jpg","price":9.9,"stock":1},{"id":414,"title":"建筑构造","author":"","cover":"covers/IMG_20260901_201634.jpg","price":9.9,"stock":1},{"id":415,"title":"建筑工程测量（美）","author":"","cover":"covers/IMG_20260901_201804.jpg","price":9.9,"stock":1},{"id":416,"title":"建筑工程制图","author":"","cover":"covers/IMG_20260901_202635.jpg","price":9.9,"stock":1},{"id":417,"title":"房屋构成与构造","author":"","cover":"covers/IMG_20260901_202638.jpg","price":9.9,"stock":1},{"id":418,"title":"钢筋平法试图与计算","author":"","cover":"covers/IMG_20260901_202641.jpg","price":9.9,"stock":1},{"id":419,"title":"钢筋平法试图与计算","author":"","cover":"covers/IMG_20260901_202644.jpg","price":9.9,"stock":1},{"id":420,"title":"土力学与地基基础","author":"","cover":"covers/IMG_20260901_202655.jpg","price":9.9,"stock":1},{"id":421,"title":"建筑力学与结构","author":"","cover":"covers/IMG_20260901_203146.jpg","price":9.9,"stock":1},{"id":422,"title":"建筑材料","author":"","cover":"covers/IMG_20260901_203150.jpg","price":9.9,"stock":1},{"id":423,"title":"建筑工程CAD","author":"","cover":"covers/IMG_20260901_203155.jpg","price":9.9,"stock":1},{"id":424,"title":"装配式混凝土建筑施工","author":"","cover":"covers/IMG_20260901_203159.jpg","price":9.9,"stock":1},{"id":425,"title":"混凝土建筑施工","author":"","cover":"covers/IMG_20260901_203202.jpg","price":9.9,"stock":1},{"id":426,"title":"建筑工程测量","author":"","cover":"covers/IMG_20260901_203230.jpg","price":9.9,"stock":1},{"id":427,"title":"钢结构制作与安装","author":"","cover":"covers/IMG_20260901_203504.jpg","price":9.9,"stock":1},{"id":428,"title":"建设工程监理","author":"","cover":"covers/IMG_20260901_203506.jpg","price":9.9,"stock":1},{"id":429,"title":"土力学与地基基础","author":"","cover":"covers/IMG_20260901_203509.jpg","price":9.9,"stock":1},{"id":430,"title":"建筑材料","author":"","cover":"covers/IMG_20260901_203511.jpg","price":9.9,"stock":1},{"id":431,"title":"建筑材料","author":"","cover":"covers/IMG_20260901_203515.jpg","price":9.9,"stock":1},{"id":432,"title":"建筑施工技术","author":"","cover":"covers/IMG_20260901_203814.jpg","price":9.9,"stock":1},{"id":433,"title":"建筑力学与结构","author":"","cover":"covers/IMG_20260901_203817.jpg","price":9.9,"stock":1},{"id":434,"title":"钢筋平法识图与算量","author":"","cover":"covers/IMG_20260901_203820.jpg","price":9.9,"stock":1},{"id":435,"title":"建筑装饰装修工程施工","author":"","cover":"covers/IMG_20260901_203823.jpg","price":9.9,"stock":1},{"id":436,"title":"钢结构","author":"","cover":"covers/IMG_20260901_203825.jpg","price":9.9,"stock":1},{"id":437,"title":"钢结构","author":"","cover":"covers/IMG_20260901_203828.jpg","price":9.9,"stock":1},{"id":438,"title":"建筑施工技术","author":"","cover":"covers/IMG_20260901_203840.jpg","price":9.9,"stock":1},{"id":439,"title":"建筑施工组织与管理","author":"","cover":"covers/IMG_20260901_204413.jpg","price":9.9,"stock":1},{"id":440,"title":"建筑材料","author":"","cover":"covers/IMG_20260901_204415.jpg","price":9.9,"stock":1},{"id":441,"title":"建筑工程经济","author":"","cover":"covers/IMG_20260901_204417.jpg","price":9.9,"stock":1},{"id":442,"title":"建设工程法规","author":"","cover":"covers/IMG_20260901_204420.jpg","price":9.9,"stock":1},{"id":443,"title":"建设工程招标投标","author":"","cover":"covers/IMG_20260901_204423.jpg","price":9.9,"stock":1},{"id":444,"title":"建筑施工组织与管理（第二版）","author":"","cover":"covers/IMG_20260901_204429.jpg","price":9.9,"stock":1},{"id":445,"title":"UG NX全实例教程","author":"","cover":"covers/IMG_20260901_204746.jpg","price":9.9,"stock":1},{"id":446,"title":"UG NX入门到精通","author":"","cover":"covers/IMG_20260901_204750.jpg","price":9.9,"stock":1},{"id":447,"title":"UG NX实例教程","author":"","cover":"covers/IMG_20260901_204753.jpg","price":9.9,"stock":1},{"id":448,"title":"UG NX12.0数控编程与加工案例教程","author":"","cover":"covers/IMG_20260901_204759.jpg","price":9.9,"stock":1},{"id":449,"title":"计算机辅助设计","author":"","cover":"covers/IMG_20260901_204801.jpg","price":9.9,"stock":1},{"id":450,"title":"计算机辅助设计","author":"","cover":"covers/IMG_20260901_204803.jpg","price":9.9,"stock":1},{"id":451,"title":"UG NX零基础编程","author":"","cover":"covers/IMG_20260901_204807.jpg","price":9.9,"stock":1},{"id":452,"title":"UGNX数控编程","author":"","cover":"covers/IMG_20260901_204811.jpg","price":9.9,"stock":1},{"id":453,"title":"三维建模及自动编程","author":"","cover":"covers/IMG_20260901_204814.jpg","price":9.9,"stock":1},{"id":454,"title":"UG NX数控编程","author":"","cover":"covers/IMG_20260901_204820.jpg","price":9.9,"stock":1},{"id":455,"title":"UG NX基础教程","author":"","cover":"covers/IMG_20260901_204826.jpg","price":9.9,"stock":1},{"id":456,"title":"三维建模实用教程","author":"","cover":"covers/IMG_20260901_204829.jpg","price":9.9,"stock":1},{"id":457,"title":"注塑模具设计","author":"","cover":"covers/IMG_20260901_204835.jpg","price":9.9,"stock":1},{"id":458,"title":"UGNX10.0案例教程","author":"","cover":"covers/IMG_20260901_204838.jpg","price":9.9,"stock":1},{"id":459,"title":"气压与液压传动","author":"","cover":"covers/IMG_20260901_204843.jpg","price":9.9,"stock":1},{"id":460,"title":"实用阶梯英语","author":"","cover":"covers/IMG_20260902_164012.jpg","price":9.9,"stock":1},{"id":461,"title":"实用阶梯英语","author":"","cover":"covers/IMG_20260902_164022.jpg","price":9.9,"stock":1},{"id":462,"title":"领队英语","author":"","cover":"covers/IMG_20260902_164200.jpg","price":9.9,"stock":1},{"id":463,"title":"英语泛读教程","author":"","cover":"covers/IMG_20260902_164206.jpg","price":9.9,"stock":1},{"id":464,"title":"新媒体技术基础","author":"","cover":"covers/IMG_20260902_164212.jpg","price":9.9,"stock":1},{"id":465,"title":"新媒体技术应用","author":"","cover":"covers/IMG_20260902_164217.jpg","price":9.9,"stock":1},{"id":466,"title":"要幼儿音乐启蒙教育","author":"","cover":"covers/IMG_20260902_164248.jpg","price":9.9,"stock":1},{"id":467,"title":"侍酒服务与管理","author":"","cover":"covers/IMG_20260902_174045.jpg","price":9.9,"stock":1},{"id":468,"title":"新媒体文案策划与写作","author":"","cover":"covers/IMG_20260902_174554.jpg","price":9.9,"stock":1},{"id":469,"title":"C语言程序设计项目化教程","author":"","cover":"covers/IMG_20260902_202828.jpg","price":9.9,"stock":1},{"id":470,"title":"室内装饰工程制图与识图","author":"","cover":"covers/MVIMG_20260831_011005_1788168712266edit.jpg","price":9.9,"stock":1}];
+    books.forEach((b) => {
+      b.price = (Number.isFinite(+b.price) && +b.price >= 0) ? +b.price : 9.9;
+      b.stock = (Number.isInteger(+b.stock) && +b.stock >= 0) ? +b.stock : 1;
+    });
 
-    // ============ 渲染 ============
-    const grid = document.getElementById("bookGrid");
-    const emptyState = document.getElementById("emptyState");
-    const resultInfo = document.getElementById("resultInfo");
+    // TODO: REPLACE_ME 店主微信号 / 联系电话（如需在复制文案里带上，改这里）
+    const STORE_WECHAT = "XXXXX";
 
-    function esc(str) {
-      return String(str ?? "")
-        .replace(/&/g, "&amp;").replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    const $ = (s) => document.querySelector(s);
+    const fmt = (n) => "¥" + (Math.round((+n || 0) * 100) / 100).toFixed(2);
+    const esc = (s) => String(s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    const bookById = (id) => books.find((b) => b.id === Number(id)) || null;
+
+    // ============ Toast ============
+    let toastTimer = null;
+    function toast(msg) {
+      const t = $("#toast");
+      t.textContent = msg;
+      t.classList.add("show");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => t.classList.remove("show"), 2000);
     }
 
-    function cardHtml(book, i) {
+    // ============ 页面滚动锁（lightbox/抽屉/弹窗共用计数） ============
+    let lockN = 0;
+    function lockScroll() { lockN++; document.body.style.overflow = "hidden"; }
+    function unlockScroll() { lockN = Math.max(0, lockN - 1); if (!lockN) document.body.style.overflow = ""; }
+
+    // ============ CartManager：购物车状态 + localStorage 持久化 ============
+    const CART_KEY = "sx_cart_v2";
+    const CartManager = {
+      items: [], // [{ id, qty }]
+
+      load() {
+        try {
+          const raw = JSON.parse(localStorage.getItem(CART_KEY) || "[]");
+          const seen = new Map();
+          raw.forEach((it) => {
+            const b = bookById(it && it.id);
+            if (!b) return;
+            const qty = Math.min(Math.max(1, Math.floor(+it.qty) || 1), Math.max(0, b.stock));
+            if (qty >= 1) seen.set(b.id, { id: b.id, qty });
+          });
+          this.items = [...seen.values()];
+        } catch (e) { this.items = []; }
+        this._save(false);
+      },
+
+      _save(notify = true) {
+        try { localStorage.setItem(CART_KEY, JSON.stringify(this.items)); } catch (e) {}
+        if (typeof refreshCartUI === "function") refreshCartUI();
+        if (notify && typeof cartBump === "function") cartBump();
+      },
+
+      find(id) { return this.items.find((it) => it.id === Number(id)); },
+      getCount() { return this.items.reduce((s, it) => s + it.qty, 0); },
+      getTotal() { return this.items.reduce((s, it) => s + (bookById(it.id)?.price || 0) * it.qty, 0); },
+
+      addToCart(id) {
+        const b = bookById(id);
+        if (!b) return { ok: false, msg: "找不到这本书" };
+        if (b.price <= 0) return { ok: false, msg: "价格面议，暂不可购" };
+        if (b.stock <= 0) return { ok: false, msg: "已售罄" };
+        let it = this.find(id);
+        if (it) {
+          if (it.qty >= b.stock) return { ok: false, msg: "已达库存上限", full: true };
+          it.qty++;
+        } else {
+          this.items.push({ id: Number(id), qty: 1 });
+        }
+        this._save(true);
+        return { ok: true, msg: "已加入购物车 ✓" };
+      },
+
+      removeFromCart(id) {
+        this.items = this.items.filter((it) => it.id !== Number(id));
+        this._save(true);
+      },
+
+      // delta: +1 / -1；到 0 时不自动删，返回 {hitZero:true} 由调用方确认
+      updateQuantity(id, delta) {
+        const it = this.find(id);
+        const b = bookById(id);
+        if (!it || !b) return { hitZero: false };
+        const next = it.qty + delta;
+        if (next <= 0) return { hitZero: true };
+        if (delta > 0 && next > b.stock) { toast("已达库存上限"); return { hitZero: false }; }
+        it.qty = next;
+        this._save(true);
+        return { hitZero: false };
+      },
+
+      clear() { this.items = []; this._save(true); },
+      checkout() { return this.getCount() > 0; }
+    };
+
+    // ============ 全局 UI 刷新（badge + 卡片按钮 + 打开着的面板） ============
+    function refreshAllCardBtns() {
+      if (!grid) return;
+      grid.querySelectorAll("button[data-add]").forEach((b) => {
+        const bk = bookById(Number(b.dataset.add));
+        if (bk) b.outerHTML = addBtnHTML(bk);
+      });
+    }
+    function refreshCartUI() {
+      const n = CartManager.getCount();
+      const badge = $("#cartBadge");
+      badge.style.display = n ? "" : "none";
+      badge.textContent = n;
+      $("#cartTitleCount").textContent = n ? `（共 ${n} 件）` : "";
+      refreshAllCardBtns();
+      if ($("#cartPanel").classList.contains("open")) renderCartList();
+      if ($("#coPanel").classList.contains("open")) renderCheckoutContent(true);
+    }
+    function cartBump() {
+      const f = $("#cartFab");
+      f.classList.remove("bump");
+      void f.offsetWidth;
+      f.classList.add("bump");
+    }
+
+    // ============ 渲染书籍卡片 ============
+    const grid = $("#bookGrid");
+    const emptyState = $("#emptyState");
+    const resultInfo = $("#resultInfo");
+
+    function addBtnHTML(b) {
+      const cur = CartManager.find(b.id);
+      const soldOut = b.stock <= 0;
+      const unpriced = b.price <= 0;
+      if (soldOut || unpriced) {
+        return `<button class="addbtn add-off" disabled>${soldOut ? "已售罄" : "价格面议"}</button>`;
+      }
+      if (!cur) return `<button class="addbtn add-neu" data-add="${b.id}">＋ 加入购物车</button>`;
+      if (cur.qty >= b.stock) {
+        const extra = b.stock > 1 ? `（${cur.qty}/${b.stock}）` : "";
+        return `<button class="addbtn add-full" data-add="${b.id}" data-open-cart="1">✓ 已加购${extra}</button>`;
+      }
+      return `<button class="addbtn add-ing" data-add="${b.id}">＋ 再加一件（已×${cur.qty}）</button>`;
+    }
+
+    function cardHtml(book) {
       const hasCover = typeof book.cover === "string" && book.cover.trim() !== "";
       const titleText = (book.title && book.title.trim()) ? book.title : "（书名待补）";
       const imgHtml = hasCover
@@ -105,28 +393,38 @@
               onerror="this.style.display='none';this.parentElement.querySelector('.cover-fallback').style.display='flex';" />`
         : "";
       const fallbackHtml =
-        `<div class="cover-fallback absolute inset-0 w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-emerald-100 to-emerald-50" style="display:${hasCover ? "none" : "flex"}">
-           <svg class="w-9 h-9 mb-1.5 text-emerald-400" fill="currentColor" viewBox="0 0 24 24">
+        `<div class="cover-fallback absolute inset-0 w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-orange-100 to-orange-50" style="display:${hasCover ? "none" : "flex"}">
+           <svg class="w-9 h-9 mb-1.5 text-orange-400" fill="currentColor" viewBox="0 0 24 24">
              <path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H6.5a2.5 2.5 0 0 0 0 5H20v2H6.5A4.5 4.5 0 0 1 2 20.5v-16zM6.5 4H7v13H6.5a2.49 2.49 0 0 0-.5.05V6.5A2.5 2.5 0 0 1 6.5 4z" opacity=".85"/>
            </svg>
-           <span class="text-[11px] text-emerald-500/70">暂无封面</span>
+           <span class="text-[11px] text-orange-500/70">暂无封面</span>
          </div>`;
       const titleClass = (book.title && book.title.trim()) ? "text-gray-800" : "text-gray-400";
+      const priceHtml = book.price > 0
+        ? `<span class="text-rose-600 font-bold" style="font-size:15px">${fmt(book.price)}</span>`
+        : `<span class="text-gray-400" style="font-size:12px">价格面议</span>`;
+      const stockHtml = book.stock <= 0
+        ? `<span class="text-rose-500" style="font-size:11px">已售罄</span>`
+        : `<span class="text-gray-400" style="font-size:11px">库存：${book.stock}</span>`;
+      const authorHtml = (book.author && book.author.trim())
+        ? `<p class="text-xs text-gray-500 mt-0.5 line-clamp-1">${esc(book.author)}</p>` : "";
       return `
         <article class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden flex flex-col hover:shadow-md transition-shadow">
           <div class="cover relative aspect-[3/4] bg-gray-100">
             ${imgHtml}
             ${fallbackHtml}
           </div>
-          <div class="px-2.5 pt-2 pb-3 flex flex-col flex-1">
+          <div class="px-2.5 pt-2 pb-2.5 flex flex-col flex-1">
             <h3 class="font-semibold text-[15px] leading-snug ${titleClass} line-clamp-2">${esc(titleText)}</h3>
-            ${(book.author && book.author.trim()) ? `<p class="text-xs text-gray-500 mt-1 line-clamp-1">${esc(book.author)}</p>` : ""}
+            ${authorHtml}
+            <div class="flex items-baseline justify-between mt-1.5">${priceHtml}${stockHtml}</div>
+            ${addBtnHTML(book)}
           </div>
         </article>`;
     }
 
     function render(list) {
-      grid.innerHTML = list.map((b, i) => cardHtml(b, i)).join("");
+      grid.innerHTML = list.map((b) => cardHtml(b)).join("");
       const empty = list.length === 0;
       emptyState.classList.toggle("hidden", !empty);
       grid.classList.toggle("hidden", empty);
@@ -134,7 +432,7 @@
     }
 
     // ============ 实时过滤 ============
-    const searchInput = document.getElementById("searchInput");
+    const searchInput = $("#searchInput");
     function applyFilter() {
       const kw = searchInput.value.trim().toLowerCase();
       const filtered = kw
@@ -144,96 +442,231 @@
     }
     searchInput.addEventListener("input", applyFilter);
 
-    // ============ 看大图（点二维码 / 双击封面打开） ============
-    // 打开即整图适配屏幕，不会只显示一部分；双击 1x/2x 切换，放大后可拖动
-    const lightbox = document.getElementById("lightbox");
-    const lbImg = document.getElementById("lightboxImg");
-    let lbZoom = 1, lbX = 0, lbY = 0, lbPointer = null;
-    let lbStartX = 0, lbStartY = 0, lbMoved = false, lastTap = 0;
-
-    function lbApply() {
-      lbImg.style.transform = `translate(${lbX}px, ${lbY}px) scale(${lbZoom})`;
-    }
-    function lbClamp() {
-      const W = lbImg.offsetWidth * lbZoom, H = lbImg.offsetHeight * lbZoom;
-      const vw = lightbox.clientWidth, vh = lightbox.clientHeight;
-      const mx = Math.max(0, (W - vw) / 2), my = Math.max(0, (H - vh) / 2);
-      lbX = Math.max(-mx, Math.min(mx, lbX));
-      lbY = Math.max(-my, Math.min(my, lbY));
-    }
-    function lbReset() {
-      lbZoom = 1; lbX = 0; lbY = 0;
-      lbImg.style.transition = "transform .18s ease";
-      lbApply();
-    }
-    function openLightbox(src, alt) {
-      lbImg.src = src;
-      lbImg.alt = alt || "";
-      lbReset();
-      lightbox.classList.add("open");
-      document.body.style.overflow = "hidden"; // 防止背景滚动
-    }
-    function closeLightbox() {
-      if (!lightbox.classList.contains("open")) return;
-      lightbox.classList.remove("open");
-      lbImg.src = "";
-      document.body.style.overflow = "";
-    }
-
-    // 图片上的触摸/鼠标手势：双击缩放，放大后单指拖动
-    lbImg.addEventListener("pointerdown", (e) => {
-      lbPointer = e.pointerId;
-      lbStartX = e.clientX; lbStartY = e.clientY;
-      lbMoved = false;
-      if (lbZoom > 1) lbImg.setPointerCapture?.(e.pointerId);
-    });
-    lbImg.addEventListener("pointermove", (e) => {
-      if (e.pointerId !== lbPointer || lbZoom <= 1) return;
-      const dx = e.clientX - lbStartX, dy = e.clientY - lbStartY;
-      if (!lbMoved && Math.hypot(dx, dy) < 8) return;
-      lbMoved = true;
-      lbX += dx; lbY += dy;
-      lbStartX = e.clientX; lbStartY = e.clientY;
-      lbClamp();
-      lbImg.style.transition = "none";
-      lbApply();
-    });
-    lbImg.addEventListener("pointerup", (e) => {
-      if (e.pointerId !== lbPointer) return;
-      lbPointer = null;
-      if (lbMoved) return; // 拖动结束，不是点击
-      if (lbZoom > 1) {    // 放大态单击 → 还原 1x
-        lbZoom = 1; lbX = 0; lbY = 0;
-        lbImg.style.transition = "transform .18s ease";
-        lbApply();
+    // ============ 网格事件：加购按钮 + 双击放大 ============
+    grid.addEventListener("click", (e) => {
+      const btn = e.target.closest("button[data-add]");
+      if (!btn) return;
+      const id = Number(btn.dataset.add);
+      const cur = CartManager.find(id);
+      const b = bookById(id);
+      if (btn.dataset.openCart === "1" || (b && cur && b.stock > 0 && cur.qty >= b.stock)) {
+        openCart();
         return;
       }
-      const now = Date.now(); // 1x 态下两次 300ms 内点击 → 放大 2x
-      if (now - lastTap < 300) {
-        lbZoom = 2; lastTap = 0;
-        lbImg.style.transition = "transform .18s ease";
-        lbApply();
-      } else lastTap = now;
+      const r = CartManager.addToCart(id);
+      toast(r.msg);
+      if (r.ok) refreshCartUI();
     });
-    lbImg.addEventListener("pointercancel", () => { lbPointer = null; });
 
-    // 双击封面 → 看大图
+    function openLightbox(src, alt) {
+      const img = $("#lightboxImg");
+      img.src = src;
+      img.alt = alt || "";
+      $("#lightbox").classList.add("open");
+      lockScroll();
+    }
+    function closeLightbox() {
+      const lb = $("#lightbox");
+      if (!lb.classList.contains("open")) return;
+      lb.classList.remove("open");
+      $("#lightboxImg").src = "";
+      unlockScroll();
+    }
     grid.addEventListener("dblclick", (e) => {
       const img = e.target.closest("img[data-zoom]");
       if (img && img.src) openLightbox(img.src, img.alt);
     });
 
-    // 点击顶部二维码 → 页内大图（整张显示，无需手动缩放）
-    document.getElementById("qrBtn").addEventListener("click", () => {
-      openLightbox("二维码.jpg", "咨询/付款二维码");
+    // ============ 购物车抽屉 ============
+    function openCart() {
+      if (!CartManager.getCount()) { toast("购物车空空如也"); return; }
+      renderCartList();
+      $("#cartVeil").classList.add("on");
+      $("#cartPanel").classList.add("open");
+      lockScroll();
+    }
+    function closeCart() {
+      $("#cartPanel").classList.remove("open");
+      $("#cartVeil").classList.remove("on");
+      unlockScroll();
+    }
+
+    function renderCartList() {
+      const box = $("#cartList");
+      if (!CartManager.items.length) {
+        box.innerHTML = `<div style="text-align:center;color:#94a3b8;padding:46px 0;font-size:14px">
+          🛒 购物车还是空的<br><span style="font-size:12px">去挑几本想买的书吧</span></div>`;
+        $("#cartTotal").textContent = fmt(0);
+        return;
+      }
+      box.innerHTML = CartManager.items.map((it) => {
+        const b = bookById(it.id);
+        if (!b) return "";
+        const title = (b.title || "").trim() || "（书名待补）";
+        const author = (b.author || "").trim();
+        const cover = b.cover ? `<img src="${b.cover}" alt="" loading="lazy" />` : "";
+        const atMax = it.qty >= b.stock;
+        return `
+          <div class="cp-item" data-id="${b.id}">
+            ${cover}
+            <div style="flex:1;min-width:0">
+              <div class="it-t line-clamp-1">${esc(title)}</div>
+              <div class="it-p line-clamp-1">${author ? esc(author) : ""} ${fmt(b.price)}/本</div>
+            </div>
+            <div class="qty">
+              <button data-q="-1" data-id="${b.id}" aria-label="减少数量">−</button>
+              <span class="n">${it.qty}</span>
+              <button data-q="1" data-id="${b.id}" aria-label="增加数量" ${atMax ? "disabled" : ""}>＋</button>
+            </div>
+          </div>`;
+      }).join("");
+      $("#cartTotal").textContent = fmt(CartManager.getTotal());
+    }
+
+    // 购物车面板事件（委托）
+    $("#cartList").addEventListener("click", (e) => {
+      const btn = e.target.closest("button[data-q]");
+      if (!btn) return;
+      const id = Number(btn.dataset.id);
+      const it = CartManager.find(id);
+      const b = bookById(id);
+      const delta = Number(btn.dataset.q);
+      if (delta < 0 && it && it.qty <= 1) {
+        // 减到 0 → 询问是否删除
+        const name = (b && b.title) || "该商品";
+        if (confirm(`从购物车移除「${name}」吗？`)) CartManager.removeFromCart(id);
+        return;
+      }
+      const r = CartManager.updateQuantity(id, delta);
+      if (r.hitZero) CartManager.removeFromCart(id);
+    });
+    $("#btnClearCart").addEventListener("click", () => {
+      if (CartManager.getCount() && confirm("确定清空购物车？")) { CartManager.clear(); toast("已清空购物车"); }
+    });
+    $("#btnCheckout").addEventListener("click", () => {
+      if (!CartManager.checkout()) { toast("购物车空空如也"); return; }
+      openCheckout();
+    });
+    $("#cartFab").addEventListener("click", openCart);
+
+    // ============ 结算弹窗 ============
+    function openCheckout() {
+      renderCheckoutContent(false);
+      $("#coVeil").classList.add("on");
+      $("#coPanel").classList.add("open");
+      lockScroll();
+    }
+    function closeCheckout() {
+      $("#coPanel").classList.remove("open");
+      $("#coVeil").classList.remove("on");
+      unlockScroll();
+    }
+    function renderCheckoutContent(keepForm) {
+      const items = CartManager.items;
+      const total = CartManager.getTotal();
+      const count = CartManager.getCount();
+      $("#coCount").textContent = `（共 ${count} 件）`;
+      $("#coTotal").textContent = total.toFixed(2);
+      const box = $("#coItems");
+      if (!items.length) {
+        box.innerHTML = `<div style="text-align:center;color:#94a3b8;padding:26px 0;font-size:13px">没有商品</div>`;
+        return;
+      }
+      box.innerHTML = items.map((it) => {
+        const b = bookById(it.id);
+        if (!b) return "";
+        const title = (b.title || "").trim() || "（书名待补）";
+        const author = (b.author || "").trim();
+        return `<div class="flex items-center justify-between" style="padding:8px 0;border-bottom:1px dashed #f1f5f9">
+          <div style="min-width:0;padding-right:10px">
+            <div style="font-size:13px;font-weight:600;line-height:1.3" class="line-clamp-1">${esc(title)}</div>
+            <div style="font-size:11px;color:#94a3b8">${author ? esc(author) : ""} × ${it.qty}</div>
+          </div>
+          <div style="font-size:13px;font-weight:600;color:#334155;flex:none">${fmt((b.price || 0) * it.qty)}</div>
+        </div>`;
+      }).join("");
+    }
+
+    function buildOrderText() {
+      const name = $("#ckName").value.trim();
+      const phone = $("#ckPhone").value.trim();
+      const addr = $("#ckAddr").value.trim();
+      const L = [];
+      L.push("【二手书订单】");
+      L.push("——— 买家信息 ———");
+      L.push(`姓名：${name || "（未填）"}`);
+      L.push(`手机/微信：${phone || "（未填）"}`);
+      L.push(`收货：${addr || "（未填）"}`);
+      L.push("——— 商品明细 ———");
+      CartManager.items.forEach((it) => {
+        const b = bookById(it.id);
+        if (!b) return;
+        const t = (b.title || "").trim() || "（书名待补）";
+        const au = (b.author || "").trim();
+        L.push(`${it.qty}. ${t}${au ? "（" + au + "）" : ""} × ${it.qty}   ${fmt((b.price || 0) * it.qty)}`);
+      });
+      L.push(`合计：${fmt(CartManager.getTotal())}（共 ${CartManager.getCount()} 件）`);
+      if (STORE_WECHAT && STORE_WECHAT !== "XXXXX") L.push(`店主微信：${STORE_WECHAT}`);
+      L.push("请核对订单无误，确认后再付款，谢谢！");
+      return L.join("\n");
+    }
+
+    // 复制：优先 navigator.clipboard；微信旧内核等不支持时退回 execCommand
+    function copyText(text, okMsg) {
+      function fallback() {
+        const ta = document.createElement("textarea");
+        ta.value = text;
+        ta.style.cssText = "position:fixed;left:-9999px;top:0;opacity:0";
+        document.body.appendChild(ta);
+        ta.focus(); ta.select();
+        let done = false;
+        try { done = document.execCommand("copy"); } catch (e) {}
+        ta.remove();
+        done ? toast(okMsg) : toast("自动复制失败，请长按上面文字手动复制");
+      }
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(text).then(() => toast(okMsg)).catch(fallback);
+      } else {
+        fallback();
+      }
+    }
+
+    $("#btnCopy").addEventListener("click", () => {
+      const name = $("#ckName").value.trim();
+      const phone = $("#ckPhone").value.trim();
+      if (!name) { toast("请填写姓名"); return; }
+      if (!phone) { toast("请填写手机号/微信号"); return; }
+      if (!CartManager.checkout()) { toast("购物车空空如也"); return; }
+      copyText(buildOrderText(), "订单信息已复制！请打开微信发送给店主");
     });
 
+    // ============ 进入欢迎提示框 ============
+    function openWelcome() {
+      $("#welVeil").classList.add("on");
+      $("#welPanel").classList.add("open");
+      lockScroll();
+    }
+    function closeWelcome() {
+      const p = $("#welPanel");
+      if (!p.classList.contains("open")) return;
+      $("#welPanel").classList.remove("open");
+      $("#welVeil").classList.remove("on");
+      unlockScroll();
+    }
+
+    // ============ 按 Esc 关闭最上层弹层 ============
     document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape") closeLightbox();
+      if (e.key !== "Escape") return;
+      if ($("#welPanel").classList.contains("open")) closeWelcome();
+      else if ($("#coPanel").classList.contains("open")) closeCheckout();
+      else if ($("#cartPanel").classList.contains("open")) closeCart();
+      else if ($("#lightbox").classList.contains("open")) closeLightbox();
     });
 
-    // 初次渲染全部
+    // ============ 启动：读购物车 + 渲染全部 + 弹出欢迎提示 ============
+    CartManager.load();
     render(books);
+    openWelcome();
   </script>
 </body>
 </html>
