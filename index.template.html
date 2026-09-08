@@ -77,6 +77,19 @@
     .co-inp{width:100%;border:1px solid #e2e8f0;border-radius:9px;padding:9px 10px;font-size:14px;outline-color:#f97316;
       background:#f8fafc}
     .co-inp:focus{background:#fff}
+    .co-sel{appearance:none;-webkit-appearance:none;cursor:pointer;padding-right:28px;
+      background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2394a3b8' stroke-width='1.6' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat:no-repeat;background-position:right 11px center}
+    .co-foot{flex:none;border-top:1px solid #f1f5f9;padding:12px 18px calc(12px + env(safe-area-inset-bottom));display:flex;gap:10px}
+
+    /* ============ 下单成功弹层(确认后显示二维码+复制订单) ============ */
+    #okVeil{position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:124;opacity:0;pointer-events:none;transition:opacity .22s}
+    #okVeil.on{opacity:1;pointer-events:auto}
+    #okPanel{position:fixed;left:50%;top:50%;transform:translate(-50%,-46%) scale(.98);width:min(92vw,430px);
+      max-height:94vh;background:#fff;border-radius:18px;z-index:126;display:flex;flex-direction:column;overflow:hidden;
+      opacity:0;pointer-events:none;transition:.25s;box-shadow:0 22px 60px rgba(0,0,0,.32)}
+    #okPanel.open{opacity:1;transform:translate(-50%,-50%);pointer-events:auto}
+    .ok-scroll{overflow-y:auto;-webkit-overflow-scrolling:touch;padding:22px 18px calc(14px + env(safe-area-inset-bottom));text-align:center}
 
     /* ============ 进入欢迎提示框 ============ */
     #welPanel{position:fixed;left:50%;top:50%;transform:translate(-50%,-46%) scale(.96);width:min(86vw,400px);
@@ -91,56 +104,118 @@
       background:rgba(17,24,39,.93);color:#fff;padding:9px 17px;border-radius:999px;font-size:13px;line-height:1.4;
       opacity:0;pointer-events:none;transition:.25s;max-width:86vw;text-align:center}
     #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+    /* ============ 暖橙书店风：主题色 / 卡片 / 分类词条 ============ */
+    .bgWarm{background:#faf6ef}
+    .g-orange{background:linear-gradient(120deg,#f97316,#f59e0b 58%,#fbbf24)}
+    .shadow-soft{box-shadow:0 1px 2px rgba(150,90,20,.04),0 8px 20px rgba(150,90,20,.06)}
+    .card-border{border-color:#f0e3d0}
+    .chip-scroll{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 9px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+    .chip-scroll::-webkit-scrollbar{display:none}
+    .chip{flex:none;display:inline-flex;align-items:center;gap:4px;border-radius:999px;border:1px solid #f7d9b3;background:#fff;
+      color:#9a4f12;font-size:13px;padding:5px 12px;cursor:pointer;touch-action:manipulation;transition:all .15s}
+    .chip small{font-size:11px;opacity:.8}
+    .chip.on{background:#f97316;border-color:#f97316;color:#fff;font-weight:600;box-shadow:0 3px 8px rgba(249,115,22,.3)}
+    .so-cover{position:relative}
+    .so-cover .dim{filter:grayscale(.6);opacity:.55}
+    .so-tag{position:absolute;left:0;right:0;bottom:0;background:linear-gradient(180deg,rgba(0,0,0,0),rgba(0,0,0,.62));
+      color:#fff;font-size:11px;letter-spacing:2px;text-align:center;padding:18px 4px 6px}
+    .stock-tag{display:inline-flex;align-items:center;gap:2px;font-size:11px;padding:2px 7px;border-radius:999px;line-height:1.4}
+    .stock-in{background:#eaf7ee;color:#1a9a4c}
+    .stock-out{background:#fdecec;color:#e11d48}
+
+    /* ============ 书籍详情浮层 ============ */
+    #dtVeil{position:fixed;inset:0;background:rgba(40,28,12,.5);z-index:72;opacity:0;pointer-events:none;transition:opacity .22s}
+    #dtVeil.on{opacity:1;pointer-events:auto}
+    #dtPanel{position:fixed;left:50%;top:50%;transform:translate(-50%,-46%) scale(.98);width:min(92vw,540px);
+      max-height:92vh;background:#fff;border-radius:18px;z-index:74;display:flex;flex-direction:column;overflow:hidden;
+      opacity:0;pointer-events:none;transition:.22s;box-shadow:0 24px 60px rgba(0,0,0,.3)}
+    #dtPanel.open{opacity:1;transform:translate(-50%,-50%);pointer-events:auto}
+    .dt-head{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;border-bottom:1px solid #f5ead9;flex:none}
+    .dt-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px 16px 8px}
+    .dt-foot{flex:none;border-top:1px solid #f5ead9;padding:12px 16px calc(12px + env(safe-area-inset-bottom));display:flex;gap:10px}
   </style>
 </head>
-<body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col">
+<body class="bgWarm text-gray-800 min-h-screen flex flex-col">
 
-  <!-- ============ 固定顶部区域：横幅 + 二维码 + 搜索 ============ -->
+  <!-- ============ 固定顶部：暖橙店招 + 咨询码 + 搜索 + 快捷词 ============ -->
   <header class="sticky top-0 z-40 shadow-sm">
-    <div class="bg-gradient-to-r from-blue-500 to-blue-600 text-white text-center py-2.5 px-4">
-      <h1 class="text-lg font-bold tracking-wide">二手书平台</h1>
-    </div>
-
-    <div class="bg-white flex flex-col items-center pt-3 pb-1">
-      <!-- 不用 <a 新窗口>：否则微信里点开是裸图要拖；且链接会挡长按“识别图中二维码”。点图改走本页全屏 lightbox -->
-      <div onclick="openLightbox('二维码.jpg','咨询 / 付款二维码')"
-         title="点开放大 · 长按识别"
-         class="relative block w-28 h-28 bg-white rounded-lg overflow-hidden border border-gray-200 shadow-sm cursor-pointer">
-        <span class="hidden absolute inset-0 items-center justify-center text-gray-400 text-xs pointer-events-none">二维码占位图</span>
-        <img src="二维码.jpg" alt="咨询/付款二维码"
-             class="absolute inset-0 w-full h-full object-contain p-0.5"
-             onerror="this.style.display='none';const s=this.parentElement.querySelector('span');s.classList.remove('hidden');s.classList.add('flex');" />
+    <div class="g-orange text-white px-4 pt-3 pb-2">
+      <div class="max-w-5xl mx-auto flex items-center justify-between gap-3">
+        <div style="min-width:0">
+          <h1 class="text-[21px] font-extrabold tracking-wide flex items-center gap-2">
+            <span style="font-size:24px">📚</span>校园二手书店</h1>
+          <p class="text-[11px] mt-0.5 text-orange-50/95">帮每一本书，找到它的下一位主人</p>
+        </div>
+        <!-- 不用 <a 新窗口>：微信里点开是裸图要拖，且会挡长按“识别图中二维码”。点图走本页全屏 lightbox -->
+        <div class="shrink-0" style="text-align:center">
+          <div onclick="openLightbox('二维码.jpg','有问题添加此二维码好友进行咨询')" title="有问题添加此二维码好友进行咨询"
+               class="w-[48px] h-[48px] mx-auto rounded-xl bg-white relative overflow-hidden shadow-md cursor-pointer">
+            <span class="hidden absolute inset-0 items-center justify-center text-[8px] text-orange-300 pointer-events-none">二维码占位</span>
+            <img src="二维码.jpg" alt="咨询/付款二维码"
+                 class="absolute inset-0 w-full h-full object-contain p-0.5"
+                 onerror="this.style.display='none';const s=this.parentElement.querySelector('span');s.classList.remove('hidden');s.classList.add('flex');" />
+          </div>
+          <div style="width:104px;margin:3px auto 0;font-size:9.5px;line-height:1.45;color:#fff3e0">有问题添加此二维码<br />好友进行咨询</div>
+        </div>
       </div>
-      <p class="text-xs text-gray-400 mt-1.5 mb-1">长按识别 · 点图可放大</p>
+      <div class="max-w-5xl mx-auto flex items-center gap-3 mt-1.5 text-[11px] text-orange-50">
+        <span>✓ 正版二手</span><span style="opacity:.45">|</span><span>✓ 低价 9.9 起</span>
+        <span style="opacity:.45">|</span><span>✓ 下单送到宿舍</span>
+      </div>
     </div>
 
-    <div class="bg-white px-4 pb-3">
+    <div class="bg-white pt-3 px-4 shadow-[0_1px_0_#f0e6d6]">
       <div class="relative max-w-5xl mx-auto">
-        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-orange-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M17 10.5a6.5 6.5 0 11-13 0 6.5 6.5 0 0113 0z" />
         </svg>
-        <input id="searchInput" type="search" placeholder="搜索书名" autocomplete="off"
-               class="w-full rounded-full border border-orange-200 bg-orange-50/60 py-2.5 pl-9 pr-4 text-sm outline-none placeholder-gray-400 focus:bg-white focus:border-orange-400 focus:ring-2 focus:ring-orange-100 transition" />
+        <input id="searchInput" type="search" placeholder="搜索书名，想买哪本直接找" autocomplete="off"
+               class="w-full rounded-full border border-orange-200 bg-orange-50/70 py-2.5 pl-9 pr-4 text-sm outline-none placeholder-orange-300/90 focus:bg-white focus:border-orange-400 focus:ring-2 focus:ring-orange-100 transition" />
+      </div>
+      <div class="max-w-5xl mx-auto">
+        <div id="chipRow" class="chip-scroll mt-2"></div>
       </div>
     </div>
   </header>
 
   <!-- ============ 书籍展示区域 ============ -->
-  <main class="flex-1 w-full max-w-5xl mx-auto px-4 py-4">
-    <p id="resultInfo" class="text-xs text-gray-400 mb-3"></p>
+  <main class="flex-1 w-full max-w-5xl mx-auto px-4 py-3 pb-24">
+    <p id="resultInfo" class="text-[13px] text-orange-700/80 font-medium mb-3"></p>
 
     <div id="emptyState" class="hidden text-center py-16 text-gray-400">
-      <p class="text-4xl mb-3">📭</p>
-      <p class="text-sm">未找到相关书籍，换个关键词试试</p>
+      <p class="text-5xl mb-3">🕵️</p>
+      <p class="text-sm">没搜到这本书…<br /><span class="text-xs text-gray-400">换个关键词试试，或点顶部词条浏览热门分类</span></p>
     </div>
 
     <div id="bookGrid" class="grid grid-cols-2 gap-3 sm:gap-4 sm:grid-cols-3 lg:grid-cols-4"></div>
   </main>
 
-  <!-- ============ 页脚 ============ -->
-  <footer class="text-center text-xs text-gray-400 py-5 px-4 pb-[max(env(safe-area-inset-bottom),1.25rem)]">
-    © 2026 二手书平台 | 联系微信：XXXXX
+  <!-- ============ 页脚：服务说明 + 联系 ============ -->
+  <footer class="text-center text-gray-500 px-4 pt-4 pb-[max(env(safe-area-inset-bottom),1.25rem)] text-xs">
+    <div class="flex items-center justify-center gap-3 flex-wrap text-[12px] mb-3 text-orange-800/80 font-medium">
+      <span>📦 下单送到宿舍</span><span style="opacity:.4">·</span>
+      <span>📱 确认订单后加店主微信付款</span><span style="opacity:.4">·</span>
+      <span>🔁 库存随下单实时扣减</span>
+    </div>
+    <div class="text-gray-400">店主微信：XXXXX ｜ 营业时间 9:00–21:00</div>
+    <div class="mt-1 text-gray-300">© 2026 校园二手书店 · 让每本书循环起来</div>
   </footer>
+
+  <!-- ============ 书籍详情浮层（点书弹出） ============ -->
+  <div id="dtVeil" onclick="closeDetail()"></div>
+  <div id="dtPanel" role="dialog" aria-label="书籍详情">
+    <div class="dt-head">
+      <h2 class="text-[16px] font-bold" style="margin:0;color:#4a2c12">📖 书籍详情</h2>
+      <button onclick="closeDetail()" aria-label="关闭"
+              style="border:none;background:none;font-size:20px;color:#9a6a3a;line-height:1;padding:4px">✕</button>
+    </div>
+    <div id="dtBody" class="dt-body"></div>
+    <div class="dt-foot">
+      <button id="dtBuy" style="flex:1;border:none;border-radius:12px;background:#f97316;color:#fff;font-size:16px;font-weight:700;padding:13px 0;touch-action:manipulation"></button>
+      <button id="dtCartGo" onclick="goCartFromDetail()" style="display:none;flex:none;border:1px solid #f97316;background:#fff7ed;color:#c2410c;border-radius:12px;font-size:15px;font-weight:700;padding:0 18px;touch-action:manipulation">去结算</button>
+    </div>
+  </div>
 
   <!-- ============ 双击封面看大图 ============ -->
   <div id="lightbox" onclick="closeLightbox()">
@@ -170,12 +245,12 @@
     </div>
   </aside>
 
-  <!-- ============ 结算弹窗 ============ -->
-  <div id="coVeil" class="veil" onclick="closeCheckout()"></div>
+  <!-- ============ 确认订单弹窗（无二维码；确认后才进下一步） ============ -->
+  <div id="coVeil" class="veil" onclick="cancelCheckout()"></div>
   <div id="coPanel" role="dialog" aria-label="确认订单">
     <div class="co-head">
       <h2 class="text-[16px] font-bold" style="margin:0">📋 确认订单</h2>
-      <button onclick="closeCheckout()" aria-label="关闭"
+      <button onclick="cancelCheckout()" aria-label="关闭"
               style="border:none;background:none;font-size:20px;color:#64748b;line-height:1;padding:4px">✕</button>
     </div>
     <div class="co-body">
@@ -185,6 +260,12 @@
       <input id="ckName" class="co-inp" type="text" placeholder="怎么称呼您" autocomplete="name" />
       <label class="co-lab">手机号 / 微信号 *</label>
       <input id="ckPhone" class="co-inp" type="tel" placeholder="方便店主联系您" autocomplete="tel" />
+      <label class="co-lab">年级</label>
+      <select id="ckGrade" class="co-inp co-sel">
+        <option value="大一" selected>大一</option>
+        <option value="大二">大二</option>
+        <option value="大三">大三</option>
+      </select>
       <label class="co-lab">宿舍 / 收货地址</label>
       <input id="ckAddr" class="co-inp" type="text" placeholder="如：3 栋 501（可选）" />
 
@@ -192,33 +273,47 @@
       <div style="font-size:14px;font-weight:700;color:#334155;margin-top:16px">订单摘要 <span id="coCount" style="font-size:12px;color:#94a3b8;font-weight:400"></span></div>
       <div id="coItems" style="border-top:1px solid #f1f5f9;margin-top:4px"></div>
 
-      <!-- 金额 + 加店主微信 -->
+      <!-- 金额 -->
       <div class="flex items-end justify-between mt-3"
            style="background:#fff7ed;border:1px solid #fed7aa;border-radius:12px;padding:12px 14px">
         <div style="font-size:13px;color:#9a3412;line-height:1.6">
           待确认订单金额<br />
-          <span style="font-size:11px;color:#c2410c">先联系店主确认，再付款</span>
+          <span style="font-size:11px;color:#c2410c">点击【确认下单】后将扣减库存，再进入添加店主微信付款</span>
         </div>
         <div class="text-rose-600" style="font-size:24px;font-weight:800">¥<span id="coTotal">0.00</span></div>
       </div>
+    </div>
+    <!-- 底部按钮 -->
+    <div class="co-foot">
+      <button id="btnCancel" style="flex:1;border:1px solid #e2e8f0;background:#fff;color:#334155;border-radius:12px;font-size:16px;font-weight:700;padding:12px 0;touch-action:manipulation">取消</button>
+      <button id="btnConfirm" style="flex:1;border:none;background:#f97316;color:#fff;border-radius:12px;font-size:16px;font-weight:700;padding:12px 0;touch-action:manipulation">确认下单</button>
+    </div>
+  </div>
+
+  <!-- ============ 下单成功弹层（确认后才出现：二维码 + 复制订单去微信） ============ -->
+  <div id="okVeil" onclick="closeOrderSuccess()"></div>
+  <div id="okPanel" role="dialog" aria-label="下单成功">
+    <div class="ok-scroll">
+      <div style="font-size:46px;line-height:1">✅</div>
+      <div style="font-size:19px;font-weight:800;color:#1e293b;margin:10px 0 4px">下单成功！请添加店主微信完成付款</div>
+      <div style="font-size:13px;color:#475569;margin-bottom:4px">应付金额 <span id="okTotal" style="color:#dc2626;font-weight:800;font-size:22px">0.00</span><span id="okCount" style="color:#94a3b8;font-size:12px"></span></div>
+      <p style="font-size:12px;color:#94a3b8;margin:0 0 6px">（已为你预留库存，请尽快付款，勿重复下单）</p>
 
       <!-- 微信二维码（与顶部同一个联系码） -->
-      <div class="text-center mt-4">
-        <div id="qrWrap" style="width:min(240px,72vw);height:min(240px,72vw);margin:0 auto;background:#fff;border:1px solid #e2e8f0;border-radius:14px;overflow:hidden;position:relative">
-          <!-- TODO: REPLACE_ME 若日后要专用的“店主微信好友码”，替换下方 src 为新的图片文件名即可 -->
-          <img id="ckQr" src="二维码.jpg" alt="店主微信二维码" style="width:100%;height:100%;object-fit:contain;padding:6px"
-               onerror="this.style.display='none';document.getElementById('qrFallback').style.display='flex';" />
-          <span id="qrFallback" style="display:none;position:absolute;inset:0;align-items:center;justify-content:center;color:#94a3b8;font-size:12px">二维码图片缺失<br/>(二维码.jpg)</span>
-        </div>
-        <p class="mt-3 mb-0" style="font-size:14px;font-weight:800;color:#dc2626;line-height:1.6">
-          请长按识别上方二维码添加店主微信，<br />添加后请发送您的订单信息，确认无误后再进行付款！
-        </p>
+      <div id="qrWrap" style="width:min(240px,72vw);height:min(240px,72vw);margin:12px auto 0;background:#fff;border:1px solid #e2e8f0;border-radius:14px;overflow:hidden;position:relative">
+        <!-- TODO: REPLACE_ME 若日后要专用的“店主微信好友码”，替换下方 src 为新的图片文件名即可 -->
+        <img id="okQr" src="二维码.jpg" alt="店主微信二维码" style="width:100%;height:100%;object-fit:contain;padding:6px"
+             onerror="this.style.display='none';document.getElementById('okFallback').style.display='flex';" />
+        <span id="okFallback" style="display:none;position:absolute;inset:0;align-items:center;justify-content:center;color:#94a3b8;font-size:12px">二维码图片缺失<br/>(二维码.jpg)</span>
       </div>
+      <p style="font-size:14px;font-weight:800;color:#dc2626;line-height:1.6;margin:14px 0 0">
+        请长按识别上方二维码添加店主微信，<br />添加后请发送您的订单信息，确认无误后再进行付款！
+      </p>
 
-      <!-- 一键复制 -->
-      <button id="btnCopy" class="w-full rounded-xl text-white text-[16px] font-bold py-3 mt-4"
-              style="background:#0f172a;touch-action:manipulation">📋 一键复制订单并去微信发送</button>
-      <p style="font-size:12px;color:#94a3b8;text-align:center;margin:8px 0 2px">复制后打开微信粘贴发送给店主即可，付款前请与店主确认订单。</p>
+      <!-- 一键复制（复制本次已确认的订单快照） -->
+      <button id="btnOkCopy" style="width:100%;border:none;border-radius:12px;background:#0f172a;color:#fff;font-size:16px;font-weight:700;padding:13px 0;margin-top:16px;touch-action:manipulation">📋 一键复制订单信息并去微信发送</button>
+      <p style="font-size:12px;color:#94a3b8;margin:8px 0 2px">复制后打开微信粘贴发送给店主即可，付款前请与店主确认订单。</p>
+      <button onclick="closeOrderSuccess()" style="width:100%;border:1px solid #e2e8f0;background:#fff;color:#334155;border-radius:12px;font-size:14px;font-weight:600;padding:11px 0;margin-top:6px;touch-action:manipulation">完成，继续逛逛</button>
     </div>
   </div>
 
@@ -255,6 +350,21 @@
       .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
     const bookById = (id) => books.find((b) => b.id === Number(id)) || null;
 
+    // ============ 已售/已下单扣减的库存（确认下单后扣减，localStorage 持久化） ============
+    const USED_KEY = "sx_stock_used_v1";
+    let stockUsed = {};
+    function loadStockUsed() {
+      try { stockUsed = JSON.parse(localStorage.getItem(USED_KEY) || "{}") || {}; }
+      catch (e) { stockUsed = {}; }
+    }
+    function saveStockUsed() {
+      try { localStorage.setItem(USED_KEY, JSON.stringify(stockUsed)); } catch (e) {}
+    }
+    // 实际可卖库存 = 底数 b.stock - 已下单数量
+    function stockLeft(b) {
+      return Math.max(0, ((b && Number(b.stock)) || 0) - (stockUsed[Number(b.id)] || 0));
+    }
+
     // ============ Toast ============
     let toastTimer = null;
     function toast(msg) {
@@ -282,7 +392,7 @@
           raw.forEach((it) => {
             const b = bookById(it && it.id);
             if (!b) return;
-            const qty = Math.min(Math.max(1, Math.floor(+it.qty) || 1), Math.max(0, b.stock));
+            const qty = Math.min(Math.max(1, Math.floor(+it.qty) || 1), stockLeft(b));
             if (qty >= 1) seen.set(b.id, { id: b.id, qty });
           });
           this.items = [...seen.values()];
@@ -304,10 +414,11 @@
         const b = bookById(id);
         if (!b) return { ok: false, msg: "找不到这本书" };
         if (b.price <= 0) return { ok: false, msg: "价格面议，暂不可购" };
-        if (b.stock <= 0) return { ok: false, msg: "已售罄" };
+        const s = stockLeft(b);
+        if (s <= 0) return { ok: false, msg: "已售罄" };
         let it = this.find(id);
         if (it) {
-          if (it.qty >= b.stock) return { ok: false, msg: "已达库存上限", full: true };
+          if (it.qty >= s) return { ok: false, msg: "已达库存上限", full: true };
           it.qty++;
         } else {
           this.items.push({ id: Number(id), qty: 1 });
@@ -328,7 +439,7 @@
         if (!it || !b) return { hitZero: false };
         const next = it.qty + delta;
         if (next <= 0) return { hitZero: true };
-        if (delta > 0 && next > b.stock) { toast("已达库存上限"); return { hitZero: false }; }
+        if (delta > 0 && next > stockLeft(b)) { toast("已达库存上限"); return { hitZero: false }; }
         it.qty = next;
         this._save(true);
         return { hitZero: false };
@@ -355,6 +466,7 @@
       refreshAllCardBtns();
       if ($("#cartPanel").classList.contains("open")) renderCartList();
       if ($("#coPanel").classList.contains("open")) renderCheckoutContent(true);
+      if (dtId != null && $("#dtPanel").classList.contains("open")) renderDetail();
     }
     function cartBump() {
       const f = $("#cartFab");
@@ -370,14 +482,15 @@
 
     function addBtnHTML(b) {
       const cur = CartManager.find(b.id);
-      const soldOut = b.stock <= 0;
+      const s = stockLeft(b);
+      const soldOut = s <= 0;
       const unpriced = b.price <= 0;
       if (soldOut || unpriced) {
         return `<button class="addbtn add-off" disabled>${soldOut ? "已售罄" : "价格面议"}</button>`;
       }
       if (!cur) return `<button class="addbtn add-neu" data-add="${b.id}">＋ 加入购物车</button>`;
-      if (cur.qty >= b.stock) {
-        const extra = b.stock > 1 ? `（${cur.qty}/${b.stock}）` : "";
+      if (cur.qty >= s) {
+        const extra = s > 1 ? `（${cur.qty}/${s}）` : "";
         return `<button class="addbtn add-full" data-add="${b.id}" data-open-cart="1">✓ 已加购${extra}</button>`;
       }
       return `<button class="addbtn add-ing" data-add="${b.id}">＋ 再加一件（已×${cur.qty}）</button>`;
@@ -386,38 +499,42 @@
     function cardHtml(book) {
       const hasCover = typeof book.cover === "string" && book.cover.trim() !== "";
       const titleText = (book.title && book.title.trim()) ? book.title : "（书名待补）";
+      const s = stockLeft(book);
+      const soldOut = s <= 0;
       const imgHtml = hasCover
         ? `<img src="${book.cover}" alt="${esc(titleText)}" loading="lazy" decoding="async"
-              data-zoom title="双击查看大图"
-              class="absolute inset-0 w-full h-full object-contain p-1"
+              class="absolute inset-0 w-full h-full object-contain p-1${soldOut ? " dim" : ""}"
               onerror="this.style.display='none';this.parentElement.querySelector('.cover-fallback').style.display='flex';" />`
         : "";
       const fallbackHtml =
-        `<div class="cover-fallback absolute inset-0 w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-orange-100 to-orange-50" style="display:${hasCover ? "none" : "flex"}">
-           <svg class="w-9 h-9 mb-1.5 text-orange-400" fill="currentColor" viewBox="0 0 24 24">
+        `<div class="cover-fallback absolute inset-0 w-full h-full flex flex-col items-center justify-center" style="display:${hasCover ? "none" : "flex"};background:linear-gradient(140deg,#ffe9cf,#fff3e2)">
+           <svg class="w-9 h-9 mb-1.5 text-orange-300" fill="currentColor" viewBox="0 0 24 24">
              <path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H6.5a2.5 2.5 0 0 0 0 5H20v2H6.5A4.5 4.5 0 0 1 2 20.5v-16zM6.5 4H7v13H6.5a2.49 2.49 0 0 0-.5.05V6.5A2.5 2.5 0 0 1 6.5 4z" opacity=".85"/>
            </svg>
-           <span class="text-[11px] text-orange-500/70">暂无封面</span>
+           <span class="text-[11px]" style="color:#d99a5b">暂无封面</span>
          </div>`;
-      const titleClass = (book.title && book.title.trim()) ? "text-gray-800" : "text-gray-400";
       const priceHtml = book.price > 0
-        ? `<span class="text-rose-600 font-bold" style="font-size:15px">${fmt(book.price)}</span>`
-        : `<span class="text-gray-400" style="font-size:12px">价格面议</span>`;
-      const stockHtml = book.stock <= 0
-        ? `<span class="text-rose-500" style="font-size:11px">已售罄</span>`
-        : `<span class="text-gray-400" style="font-size:11px">库存：${book.stock}</span>`;
+        ? `<span style="color:#ea580c;font-weight:800;font-size:16px">${fmt(book.price)}</span>`
+        : `<span style="color:#c9a06f;font-size:12px;font-weight:600">价格面议</span>`;
+      const stockTagHtml = soldOut
+        ? `<span class="stock-tag stock-out">售罄</span>`
+        : `<span class="stock-tag stock-in">有货 ${s}</span>`;
       const authorHtml = (book.author && book.author.trim())
-        ? `<p class="text-xs text-gray-500 mt-0.5 line-clamp-1">${esc(book.author)}</p>` : "";
+        ? `<p class="text-xs text-gray-500 line-clamp-1" style="margin:0">${esc(book.author)}</p>` : "";
+      const soldOverlay = (soldOut && hasCover) ? `<div class="so-tag">已售罄</div>` : "";
+      const titleColor = (book.title && book.title.trim()) ? "#3a2a18" : "#b7a284";
       return `
-        <article class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden flex flex-col hover:shadow-md transition-shadow">
-          <div class="cover relative aspect-[3/4] bg-gray-100">
+        <article data-book="${book.id}" class="flex flex-col overflow-hidden cursor-pointer transition hover:-translate-y-0.5 hover:shadow-md"
+                 style="background:#fff;border:1px solid #f0e3d0;border-radius:16px;box-shadow:0 1px 2px rgba(150,90,20,.04)">
+          <div class="so-cover relative aspect-[3/4]" style="background:#f6efe1">
             ${imgHtml}
             ${fallbackHtml}
+            ${soldOverlay}
           </div>
-          <div class="px-2.5 pt-2 pb-2.5 flex flex-col flex-1">
-            <h3 class="font-semibold text-[15px] leading-snug ${titleClass} line-clamp-2">${esc(titleText)}</h3>
+          <div class="px-3 pt-2 pb-3 flex flex-col flex-1" style="border-top:1px solid #fbf3e4;gap:8px">
+            <h3 class="font-semibold text-[15px] leading-snug line-clamp-2" style="color:${titleColor};margin:0">${esc(titleText)}</h3>
             ${authorHtml}
-            <div class="flex items-baseline justify-between mt-1.5">${priceHtml}${stockHtml}</div>
+            <div class="flex items-center justify-between" style="margin-top:auto">${priceHtml}${stockTagHtml}</div>
             ${addBtnHTML(book)}
           </div>
         </article>`;
@@ -428,7 +545,7 @@
       const empty = list.length === 0;
       emptyState.classList.toggle("hidden", !empty);
       grid.classList.toggle("hidden", empty);
-      resultInfo.textContent = empty ? "" : `共 ${list.length} 本`;
+      resultInfo.textContent = empty ? "" : `📚 当前共 ${list.length} 本 · 点书卡看详情`;
     }
 
     // ============ 实时过滤 ============
@@ -439,23 +556,144 @@
         ? books.filter((b) => ((b.title || "") + " " + (b.author || "")).toLowerCase().includes(kw))
         : books;
       render(filtered);
+      renderChips();
     }
     searchInput.addEventListener("input", applyFilter);
 
-    // ============ 网格事件：加购按钮 + 双击放大 ============
-    grid.addEventListener("click", (e) => {
-      const btn = e.target.closest("button[data-add]");
-      if (!btn) return;
-      const id = Number(btn.dataset.add);
-      const cur = CartManager.find(id);
-      const b = bookById(id);
-      if (btn.dataset.openCart === "1" || (b && cur && b.stock > 0 && cur.qty >= b.stock)) {
-        openCart();
-        return;
+    // ============ 快捷词条（点击 = 按书名搜索，实时显示命中数） ============
+    const CHIP_WORDS = ["机械", "英语", "电子", "汽车", "编程", "旅游", "幼儿", "导游", "酒店", "会计", "数学"];
+    const chipRow = $("#chipRow");
+    const bookText = (b) => ((b.title || "") + " " + (b.author || "")).toLowerCase();
+    function renderChips() {
+      const cur = searchInput.value.trim().toLowerCase();
+      let h = `<button class="chip${cur === "" ? " on" : ""}" data-c="">全部<small>${books.length}</small></button>`;
+      for (const w of CHIP_WORDS) {
+        const n = books.filter((b) => bookText(b).includes(w.toLowerCase())).length;
+        if (!n) continue;
+        const on = cur === w.toLowerCase();
+        h += `<button class="chip${on ? " on" : ""}" data-c="${esc(w)}">${esc(w)}<small>${n}</small></button>`;
       }
-      const r = CartManager.addToCart(id);
+      chipRow.innerHTML = h;
+    }
+    chipRow.addEventListener("click", (e) => {
+      const c = e.target.closest(".chip");
+      if (!c) return;
+      searchInput.value = c.dataset.c || "";
+      applyFilter();
+    });
+
+    // ============ 书籍详情浮层（点卡片弹出） ============
+    let dtId = null;
+
+    function openDetail(id) {
+      const b = bookById(id);
+      if (!b) return;
+      dtId = Number(b.id);
+      renderDetail();
+      $("#dtVeil").classList.add("on");
+      $("#dtPanel").classList.add("open");
+      lockScroll();
+    }
+    function closeDetail() {
+      const p = $("#dtPanel");
+      if (!p.classList.contains("open")) return;
+      p.classList.remove("open");
+      $("#dtVeil").classList.remove("on");
+      dtId = null;
+      unlockScroll();
+    }
+    function goCartFromDetail() {
+      closeDetail();
+      openCart();
+    }
+    function renderDetail() {
+      const b = bookById(dtId);
+      if (!b) return;
+      const titleText = (b.title && b.title.trim()) ? b.title : "（书名待补）";
+      const s = stockLeft(b);
+      const soldOut = s <= 0;
+      const hasCover = typeof b.cover === "string" && b.cover.trim() !== "";
+      const coverHtml = hasCover
+        ? `<img src="${b.cover}" alt="${esc(titleText)}" loading="lazy"
+              style="width:100%;aspect-ratio:3/4;object-fit:contain;background:#f6efe1;border-radius:10px;cursor:zoom-in;display:block;${soldOut ? "filter:grayscale(.6);opacity:.6" : ""}"
+              onclick="openLightbox('${b.cover.replace(/'/g, "")}','${esc(titleText)}')" />`
+        : `<div style="width:100%;aspect-ratio:3/4;border-radius:10px;display:flex;align-items:center;justify-content:center;background:linear-gradient(140deg,#ffe9cf,#fff3e2);color:#d99a5b;font-size:13px">暂无封面</div>`;
+      const meta = soldOut
+        ? `<span class="stock-tag stock-out">售罄</span>`
+        : `<span class="stock-tag stock-in">有货 ${s}</span>`;
+      const authorHtml = (b.author && b.author.trim())
+        ? `<div class="text-[13px] text-gray-500" style="margin-top:2px">${esc(b.author)}</div>` : "";
+      $("#dtBody").innerHTML = `
+        <div style="display:flex;gap:16px;align-items:flex-start">
+          <div style="flex:none;width:34%;max-width:170px">${coverHtml}</div>
+          <div style="flex:1;min-width:0">
+            <div class="font-bold" style="font-size:17px;line-height:1.4;color:#2f2010">${esc(titleText)}</div>
+            ${authorHtml}
+            <div style="display:flex;align-items:center;gap:8px;margin:10px 0 8px">${meta}</div>
+            <div style="display:flex;align-items:baseline;gap:6px">
+              ${b.price > 0
+                ? `<span style="color:#ea580c;font-weight:800;font-size:26px">${fmt(b.price)}</span><span style="color:#b79a6f;font-size:12px">/ 本</span>`
+                : `<span style="color:#c9a06f;font-weight:600;font-size:15px">价格面议</span>`}
+            </div>
+            <div style="font-size:12px;color:#a88a5f;margin-top:10px;line-height:1.7">📦 正版二手 · 确认订单后自动扣减库存<br>📱 添加店主微信付款，送货到宿舍</div>
+          </div>
+        </div>
+        <div style="margin:14px 0 4px;font-size:12px;color:#b08c5c;line-height:1.8;background:#fff8ec;border:1px dashed #f2d7ae;border-radius:10px;padding:9px 11px">
+          下单流程：把书加入购物车 → 去结算填写信息并确认 → 长按二维码添加店主微信 → 一键复制订单发过去付款，书就会送到宿舍啦。
+        </div>`;
+      // 底部按钮状态
+      const buy = $("#dtBuy");
+      const cartGo = $("#dtCartGo");
+      const cur = CartManager.find(dtId);
+      buy.disabled = false;
+      cartGo.style.display = cur ? "" : "none";
+      if (soldOut || b.price <= 0) {
+        buy.textContent = soldOut ? "已售罄" : "价格面议，暂不可购";
+        buy.disabled = true;
+        buy.style.cssText = "flex:1;border:none;border-radius:12px;background:#e9e2d6;color:#b3a48c;font-size:16px;font-weight:700;padding:13px 0;touch-action:manipulation";
+      } else if (cur && cur.qty >= s) {
+        buy.textContent = cur.qty > 1 ? `已在购物车 ×${cur.qty}，去结算` : "已在购物车，去结算";
+        buy.style.cssText = "flex:1;border:1px solid #f97316;background:#fff7ed;color:#c2410c;border-radius:12px;font-size:16px;font-weight:700;padding:13px 0;touch-action:manipulation";
+      } else if (cur) {
+        buy.textContent = `再加一件（已购 ${cur.qty}）`;
+        buy.style.cssText = "flex:1;border:none;border-radius:12px;background:#f97316;color:#fff;font-size:16px;font-weight:700;padding:13px 0;touch-action:manipulation";
+      } else {
+        buy.textContent = "＋ 加入购物车";
+        buy.style.cssText = "flex:1;border:none;border-radius:12px;background:#f97316;color:#fff;font-size:16px;font-weight:700;padding:13px 0;touch-action:manipulation";
+      }
+    }
+    $("#dtBuy").addEventListener("click", () => {
+      const b = bookById(dtId);
+      if (!b) return;
+      const s = stockLeft(b);
+      if (s <= 0) { toast("已售罄"); return; }
+      if (b.price <= 0) { toast("价格面议，暂不可购"); return; }
+      const cur = CartManager.find(dtId);
+      if (cur && cur.qty >= s) { goCartFromDetail(); return; }
+      const r = CartManager.addToCart(dtId);
       toast(r.msg);
       if (r.ok) refreshCartUI();
+    });
+
+    // ============ 网格事件：加购按钮走加购；点卡片其他位置弹详情 ============
+    grid.addEventListener("click", (e) => {
+      const btn = e.target.closest("button[data-add]");
+      if (btn) {
+        const id = Number(btn.dataset.add);
+        const cur = CartManager.find(id);
+        const b = bookById(id);
+        const s = b ? stockLeft(b) : 0;
+        if (btn.dataset.openCart === "1" || (b && cur && s > 0 && cur.qty >= s)) {
+          openCart();
+          return;
+        }
+        const r = CartManager.addToCart(id);
+        toast(r.msg);
+        if (r.ok) refreshCartUI();
+        return;
+      }
+      const card = e.target.closest("[data-book]");
+      if (card) openDetail(Number(card.dataset.book));
     });
 
     function openLightbox(src, alt) {
@@ -472,11 +710,6 @@
       $("#lightboxImg").src = "";
       unlockScroll();
     }
-    grid.addEventListener("dblclick", (e) => {
-      const img = e.target.closest("img[data-zoom]");
-      if (img && img.src) openLightbox(img.src, img.alt);
-    });
-
     // ============ 购物车抽屉 ============
     function openCart() {
       if (!CartManager.getCount()) { toast("购物车空空如也"); return; }
@@ -505,7 +738,7 @@
         const title = (b.title || "").trim() || "（书名待补）";
         const author = (b.author || "").trim();
         const cover = b.cover ? `<img src="${b.cover}" alt="" loading="lazy" />` : "";
-        const atMax = it.qty >= b.stock;
+        const atMax = it.qty >= stockLeft(b);
         return `
           <div class="cp-item" data-id="${b.id}">
             ${cover}
@@ -561,6 +794,50 @@
       $("#coVeil").classList.remove("on");
       unlockScroll();
     }
+    // 点【取消】/右上角✕/遮罩：仅关闭，不扣库存（购物车保留，可回抽屉再改）
+    function cancelCheckout() {
+      closeCheckout();
+    }
+
+    // 最近一次“已确认”订单的文案快照（用于下单成功页复制，购物车清空后仍可复制）
+    let lastOrderText = "";
+
+    function openOrderSuccess(total, count) {
+      $("#okTotal").textContent = total.toFixed(2);
+      $("#okCount").textContent = `（共 ${count} 件）`;
+      $("#okVeil").classList.add("on");
+      $("#okPanel").classList.add("open");
+      lockScroll();
+    }
+    function closeOrderSuccess() {
+      const p = $("#okPanel");
+      if (!p.classList.contains("open")) return;
+      p.classList.remove("open");
+      $("#okVeil").classList.remove("on");
+      unlockScroll();
+    }
+
+    // 点【确认下单】：校验 → 本地扣库存(-N) → 清空购物车 → 弹出二维码/复制订单页
+    function confirmOrder() {
+      if (!CartManager.checkout()) { toast("购物车空空如也"); return; }
+      const name = $("#ckName").value.trim();
+      const phone = $("#ckPhone").value.trim();
+      if (!name) { toast("请填写姓名"); return; }
+      if (!phone) { toast("请填写手机号/微信号"); return; }
+      lastOrderText = buildOrderText();          // 快照（在清空购物车前）
+      const total = CartManager.getTotal();
+      const count = CartManager.getCount();
+      // 扣减本地库存：本次每件下单数量累加到已售
+      CartManager.items.forEach((it) => {
+        stockUsed[Number(it.id)] = (stockUsed[Number(it.id)] || 0) + it.qty;
+      });
+      saveStockUsed();
+      CartManager.clear();
+      closeCart();
+      closeCheckout();
+      applyFilter();                             // 让卡片库存/售罄即时刷新
+      openOrderSuccess(total, count);
+    }
     function renderCheckoutContent(keepForm) {
       const items = CartManager.items;
       const total = CartManager.getTotal();
@@ -596,6 +873,8 @@
       L.push("——— 买家信息 ———");
       L.push(`姓名：${name || "（未填）"}`);
       L.push(`手机/微信：${phone || "（未填）"}`);
+      const grade = ($("#ckGrade").value || "").trim();
+      L.push(`年级：${grade || "（未填）"}`);
       L.push(`收货：${addr || "（未填）"}`);
       L.push("——— 商品明细 ———");
       CartManager.items.forEach((it) => {
@@ -631,13 +910,14 @@
       }
     }
 
-    $("#btnCopy").addEventListener("click", () => {
-      const name = $("#ckName").value.trim();
-      const phone = $("#ckPhone").value.trim();
-      if (!name) { toast("请填写姓名"); return; }
-      if (!phone) { toast("请填写手机号/微信号"); return; }
-      if (!CartManager.checkout()) { toast("购物车空空如也"); return; }
-      copyText(buildOrderText(), "订单信息已复制！请打开微信发送给店主");
+    $("#btnCancel").addEventListener("click", () => {
+      toast("已取消，库存未扣减");
+      cancelCheckout();
+    });
+    $("#btnConfirm").addEventListener("click", confirmOrder);
+    $("#btnOkCopy").addEventListener("click", () => {
+      if (!lastOrderText) { toast("没有可复制的订单"); return; }
+      copyText(lastOrderText, "订单信息已复制！请打开微信发送给店主");
     });
 
     // ============ 进入欢迎提示框 ============
@@ -657,15 +937,19 @@
     // ============ 按 Esc 关闭最上层弹层 ============
     document.addEventListener("keydown", (e) => {
       if (e.key !== "Escape") return;
-      if ($("#welPanel").classList.contains("open")) closeWelcome();
+      if ($("#okPanel").classList.contains("open")) closeOrderSuccess();
+      else if ($("#welPanel").classList.contains("open")) closeWelcome();
+      else if ($("#lightbox").classList.contains("open")) closeLightbox();
       else if ($("#coPanel").classList.contains("open")) closeCheckout();
       else if ($("#cartPanel").classList.contains("open")) closeCart();
-      else if ($("#lightbox").classList.contains("open")) closeLightbox();
+      else if ($("#dtPanel").classList.contains("open")) closeDetail();
     });
 
-    // ============ 启动：读购物车 + 渲染全部 + 弹出欢迎提示 ============
+    // ============ 启动：读已售库存 + 购物车 + 渲染全部 + 词条 + 弹出欢迎提示 ============
+    loadStockUsed();
     CartManager.load();
     render(books);
+    renderChips();
     openWelcome();
   </script>
 </body>
