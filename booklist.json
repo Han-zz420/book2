@@ -1557,7 +1557,7 @@
   "author": "",
   "ocr": "",
   "price": 9.9,
-  "stock": 2
+  "stock": 0
  },
  {
   "id": 157,
@@ -3067,7 +3067,7 @@
   "author": "",
   "ocr": "",
   "price": 9.9,
-  "stock": 2
+  "stock": 0
  },
  {
   "id": 308,
@@ -3147,7 +3147,7 @@
   "author": "",
   "ocr": "",
   "price": 9.9,
-  "stock": 68
+  "stock": 66
  },
  {
   "id": 316,
@@ -3207,7 +3207,7 @@
   "author": "",
   "ocr": "",
   "price": 9.9,
-  "stock": 2
+  "stock": 0
  },
  {
   "id": 322,
@@ -3747,7 +3747,7 @@
   "author": "",
   "ocr": "",
   "price": 9.9,
-  "stock": 1
+  "stock": 0
  },
  {
   "id": 376,
@@ -4957,7 +4957,7 @@
   "author": "",
   "ocr": "",
   "price": 9.9,
-  "stock": 19
+  "stock": 17
  },
  {
   "id": 497,
@@ -5318,5 +5318,15 @@
   "ocr": "",
   "price": 9.9,
   "stock": 34
+ },
+ {
+  "id": 533,
+  "file": "image533.jpg",
+  "cover": "covers/image533.jpg",
+  "title": "高职院校思想政治理论课实践教程（已刮码）",
+  "author": "",
+  "ocr": "",
+  "price": 9.9,
+  "stock": 50
  }
 ]
