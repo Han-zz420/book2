@@ -22,6 +22,7 @@ const books = list.map((b) => ({
   cover: b.cover || "",
   price: Number.isFinite(+b.price) && +b.price >= 0 ? Math.round(+b.price * 100) / 100 : DEF_PRICE,
   stock: Number.isInteger(+b.stock) && +b.stock >= 0 ? +b.stock : DEF_STOCK,
+  category: (b.category || "").trim(),
 }));
 const tpl = fs.readFileSync(path.join(DIR, "index.template.html"), "utf8");
 if (!tpl.includes("__BOOKS_DATA__")) throw new Error("index 模板缺少 __BOOKS_DATA__");

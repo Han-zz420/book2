@@ -5328,5 +5328,203 @@
   "ocr": "",
   "price": 9.9,
   "stock": 50
+ },
+ {
+  "id": 534,
+  "file": "image534.jpeg",
+  "cover": "covers/image534.jpeg",
+  "title": "大学生心理健康教育",
+  "author": "",
+  "ocr": "",
+  "price": 8.8,
+  "stock": 20,
+  "category": "公共课"
+ },
+ {
+  "id": 535,
+  "file": "image535.jpeg",
+  "cover": "covers/image535.jpeg",
+  "title": "大学军事理论教程",
+  "author": "",
+  "ocr": "",
+  "price": 8.8,
+  "stock": 20,
+  "category": "公共课"
+ },
+ {
+  "id": 536,
+  "file": "image536.jpeg",
+  "cover": "covers/image536.jpeg",
+  "title": "通用英语1",
+  "author": "",
+  "ocr": "",
+  "price": 8.8,
+  "stock": 20,
+  "category": "公共课"
+ },
+ {
+  "id": 537,
+  "file": "image537.jpeg",
+  "cover": "covers/image537.jpeg",
+  "title": "大学生就业指导实务",
+  "author": "",
+  "ocr": "",
+  "price": 16.66,
+  "stock": 20,
+  "category": "公共课"
+ },
+ {
+  "id": 538,
+  "file": "image538.jpeg",
+  "cover": "covers/image538.jpeg",
+  "title": "创新思维与创业管理(第2版)",
+  "author": "",
+  "ocr": "",
+  "price": 9.8,
+  "stock": 20,
+  "category": "公共课"
+ },
+ {
+  "id": 539,
+  "file": "image539.jpeg",
+  "cover": "covers/image539.jpeg",
+  "title": "国家安全教育大学生读本",
+  "author": "",
+  "ocr": "",
+  "price": 8.8,
+  "stock": 20,
+  "category": "公共课"
+ },
+ {
+  "id": 540,
+  "file": "image540.jpeg",
+  "cover": "covers/image540.jpeg",
+  "title": "高职体育立体化教程(微课版)",
+  "author": "",
+  "ocr": "",
+  "price": 8.8,
+  "stock": 20,
+  "category": "公共课"
+ },
+ {
+  "id": 541,
+  "file": "image541.jpeg",
+  "cover": "covers/image541.jpeg",
+  "title": "中国共产党简史",
+  "author": "",
+  "ocr": "",
+  "price": 8.8,
+  "stock": 20,
+  "category": "公共课"
+ },
+ {
+  "id": 542,
+  "file": "image542.jpeg",
+  "cover": "covers/image542.jpeg",
+  "title": "通用英语2",
+  "author": "",
+  "ocr": "",
+  "price": 8.8,
+  "stock": 20,
+  "category": "公共课"
+ },
+ {
+  "id": 543,
+  "file": "image543.jpeg",
+  "cover": "covers/image543.jpeg",
+  "title": "信息技术基础(微课版)",
+  "author": "",
+  "ocr": "",
+  "price": 8.8,
+  "stock": 20,
+  "category": "公共课"
+ },
+ {
+  "id": 544,
+  "file": "image544.jpeg",
+  "cover": "covers/image544.jpeg",
+  "title": "思想道德与法治 (2023年版）",
+  "author": "",
+  "ocr": "",
+  "price": 6.8,
+  "stock": 20,
+  "category": "公共课"
+ },
+ {
+  "id": 545,
+  "file": "image545.jpeg",
+  "cover": "covers/image545.jpeg",
+  "title": "梦想起航大学生职业生涯规划",
+  "author": "",
+  "ocr": "",
+  "price": 8.8,
+  "stock": 20,
+  "category": "公共课"
+ },
+ {
+  "id": 546,
+  "file": "image546.jpeg",
+  "cover": "covers/image546.jpeg",
+  "title": "毛泽东思想和中国特色社会主义理论体系2023年版",
+  "author": "",
+  "ocr": "",
+  "price": 6.8,
+  "stock": 20,
+  "category": "公共课"
+ },
+ {
+  "id": 547,
+  "file": "image547.jpeg",
+  "cover": "covers/image547.jpeg",
+  "title": "习近平新时代中国特色社会主义思想概论",
+  "author": "",
+  "ocr": "",
+  "price": 6.8,
+  "stock": 20,
+  "category": "公共课"
+ },
+ {
+  "id": 548,
+  "file": "image548.jpeg",
+  "cover": "covers/image548.jpeg",
+  "title": "创新思维与创业管理",
+  "author": "",
+  "ocr": "",
+  "price": 8.8,
+  "stock": 20,
+  "category": "公共课"
+ },
+ {
+  "id": 549,
+  "file": "image549.jpeg",
+  "cover": "covers/image549.jpeg",
+  "title": "大学生就业指导实务",
+  "author": "",
+  "ocr": "",
+  "price": 8.8,
+  "stock": 20,
+  "category": "公共课"
+ },
+ {
+  "id": 550,
+  "file": "image550.jpeg",
+  "cover": "covers/image550.jpeg",
+  "title": "大学生生涯发展与就业力提升",
+  "author": "",
+  "ocr": "",
+  "price": 8.8,
+  "stock": 20,
+  "category": "公共课"
+ },
+ {
+  "id": 551,
+  "file": "image551.png",
+  "cover": "covers/image551.png",
+  "title": "时事报告",
+  "author": "",
+  "ocr": "",
+  "price": 8.8,
+  "stock": 20,
+  "category": "公共课"
  }
 ]

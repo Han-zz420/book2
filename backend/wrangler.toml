@@ -1,0 +1,16 @@
+# Cloudflare Workers 配置文件
+# 用法：cd backend && npx wrangler dev（本地） / npx wrangler deploy（发布）
+name = "bookshop-api"
+main = "src/index.js"
+compatibility_date = "2025-01-01"
+
+# D1 数据库绑定：数据库名必须是唯一的，发布时会自动创建
+# 本地开发用 local 的 d1 存储（.wrangler/state），线上为云端 D1
+[[d1_databases]]
+binding = "DB"
+database_name = "bookshop-db"
+database_id = "54057f6e-605d-4167-95a0-3018fc49be7d"
+
+# 允许跨域（前端 Pages 与 API 可能不同域，微信内也需放行）
+[vars]
+ALLOWED_ORIGIN = "*"
