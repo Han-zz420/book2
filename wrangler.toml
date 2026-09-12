@@ -1,13 +1,19 @@
 # Cloudflare Pages 项目配置（book2）
-# 由 wrangler pages download config 生成 + 手工补充 D1 绑定
 name = "book2"
-pages_build_output_dir = ""
+# 构建输出目录：本项目是纯静态站点，产物直接放在仓库根目录
+pages_build_output_dir = "."
 compatibility_date = "2026-09-06"
 
 # D1 数据库绑定（复用已创建的 bookshop-db）
+# 顶层声明用于本地开发 + 生产环境
 [[d1_databases]]
 binding = "DB"
 database_name = "bookshop-db"
 database_id = "54057f6e-605d-4167-95a0-3018fc49be7d"
 
+# 生产环境：d1_databases 是 non-inheritable key，需在环境内显式重复声明
 [env.production]
+[[env.production.d1_databases]]
+binding = "DB"
+database_name = "bookshop-db"
+database_id = "54057f6e-605d-4167-95a0-3018fc49be7d"
