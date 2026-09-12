@@ -197,9 +197,8 @@
       <span data-page-node-id="rdYY2oBGZCMFS4A5PNnKti">📦 下单送到宿舍</span><span style="opacity:.4" data-page-node-id="0CK2PPNZpiabtdELY3DBtF">·</span>
       <span data-page-node-id="YC1SbHGBaSMMXGovcbYmx5">📱 确认订单后加店主微信付款</span><span style="opacity:.4" data-page-node-id="6H3k3F6tLMHSc0Q96iQaN0">·</span>
       <span data-page-node-id="ctdA8mFuvnfjoThNVSzlhK">🔁 库存随下单实时扣减</span>
-    </div>
-    <div class="text-gray-400" data-page-node-id="bfvk4AbLvF7RJ7fMg2yOzB">店主微信：XXXXX ｜ 营业时间 9:00–21:00</div>
-    <div class="mt-1 text-gray-300" data-page-node-id="UMTc21Y278QwNP6E1HmL11">© 2026 校园二手书店 · 让每本书循环起来</div>
+    </div> 
+    <div class="mt-1 text-gray-300" data-page-node-id="UMTc21Y278QwNP6E1HmL11">2026 校园二手书店 · 让每本书循环起来</div>
   </footer>
 
   <!-- ============ 书籍详情浮层（点书弹出） ============ -->
@@ -990,7 +989,6 @@
     }
 
     $("#btnCancel").addEventListener("click", () => {
-      toast("已取消，库存未扣减");
       cancelCheckout();
     });
     $("#btnConfirm").addEventListener("click", confirmOrder);
