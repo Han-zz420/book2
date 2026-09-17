@@ -82,6 +82,31 @@
       background-repeat:no-repeat;background-position:right 11px center}
     .co-foot{flex:none;border-top:1px solid #f1f5f9;padding:12px 18px calc(12px + env(safe-area-inset-bottom));display:flex;gap:10px}
 
+    /* ============ 我的订单弹层 ============ */
+    #ordersVeil{position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:118;opacity:0;pointer-events:none;transition:opacity .22s}
+    #ordersVeil.on{opacity:1;pointer-events:auto}
+    #ordersPanel{position:fixed;left:50%;top:50%;transform:translate(-50%,-46%) scale(.98);width:min(92vw,520px);
+      max-height:88vh;background:#fff;border-radius:18px;z-index:120;display:flex;flex-direction:column;overflow:hidden;
+      opacity:0;pointer-events:none;transition:.24s;box-shadow:0 22px 60px rgba(0,0,0,.32)}
+    #ordersPanel.open{opacity:1;transform:translate(-50%,-50%);pointer-events:auto}
+    .or-head{display:flex;align-items:center;justify-content:space-between;padding:15px 16px;border-bottom:1px solid #f5ead9;flex:none}
+    .or-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:12px 14px}
+    .or-search{display:flex;gap:8px;margin-bottom:12px}
+    .or-search input{flex:1;border:1px solid #e2e8f0;border-radius:9px;padding:9px 10px;font-size:14px;outline-color:#f97316;background:#f8fafc}
+    .or-search button{border:none;border-radius:9px;background:#f97316;color:#fff;font-size:14px;font-weight:700;padding:0 16px;touch-action:manipulation}
+    .or-item{border:1px solid #f0e3d0;border-radius:12px;padding:11px 12px;margin-bottom:10px;background:#fff}
+    .or-item .or-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+    .or-item .or-no{font-size:11px;color:#b08c5c;font-family:ui-monospace,monospace}
+    .or-item .or-time{font-size:11px;color:#c2b193}
+    .or-item .or-line{font-size:13px;color:#4a2c12;line-height:1.6;display:flex;justify-content:space-between;gap:8px}
+    .or-item .or-line .nm{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .or-item .or-line .pr{flex:none;font-weight:700;color:#ea580c}
+    .or-item .or-sum{display:flex;align-items:center;justify-content:space-between;margin-top:7px;padding-top:7px;border-top:1px dashed #f0e3d0}
+    .or-item .or-sum .amt{font-size:15px;font-weight:800;color:#dc2626}
+    .or-copy{border:none;border-radius:8px;background:#0f172a;color:#fff;font-size:12px;font-weight:700;padding:7px 12px;touch-action:manipulation}
+    .or-copy:active{opacity:.85}
+    .or-empty{text-align:center;color:#b3a48c;padding:40px 0;font-size:14px}
+
     /* ============ 下单成功弹层(确认后显示二维码+复制订单) ============ */
     #okVeil{position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:124;opacity:0;pointer-events:none;transition:opacity .22s}
     #okVeil.on{opacity:1;pointer-events:auto}
@@ -165,13 +190,24 @@
       </div>
     </div>
 
+    <!-- ============ 顶部红色警示条 ============ -->
+    <div style="background:#dc2626;color:#fff;text-align:center;padding:8px 14px;font-size:15px;font-weight:800;line-height:1.5;letter-spacing:1px" data-page-node-id="NOTICE_TOP">
+      一经下单付款再送达，非我方送错漏，概不退换，希望理解！
+    </div>
+
     <div class="bg-white pt-3 px-4 shadow-[0_1px_0_#f0e6d6]" data-page-node-id="AoNQQY73aTi0aw7LBA3h08">
-      <div class="relative max-w-5xl mx-auto" data-page-node-id="tCsyYnewUFtjobLV719eoR">
-        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-orange-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" data-page-node-id="zBgJL5Oun6nWfF9Knf6Fwn">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M17 10.5a6.5 6.5 0 11-13 0 6.5 6.5 0 0113 0z" data-page-node-id="1jhp7BHopZ1pH0gDulEUCV" />
-        </svg>
-        <input id="searchInput" type="search" placeholder="搜索书名，想买哪本直接找" autocomplete="off"
-               class="w-full rounded-full border border-orange-200 bg-orange-50/70 py-2.5 pl-9 pr-4 text-sm outline-none placeholder-orange-300/90 focus:bg-white focus:border-orange-400 focus:ring-2 focus:ring-orange-100 transition" data-page-node-id="9Lp0jJQiNBM6U7cQrChBmx" />
+      <div class="relative max-w-5xl mx-auto flex items-center gap-2" data-page-node-id="tCsyYnewUFtjobLV719eoR">
+        <div class="relative flex-1" data-page-node-id="tCsyYnewUFtjobLV719eoR2">
+          <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-orange-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" data-page-node-id="zBgJL5Oun6nWfF9Knf6Fwn">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M17 10.5a6.5 6.5 0 11-13 0 6.5 6.5 0 0113 0z" data-page-node-id="1jhp7BHopZ1pH0gDulEUCV" />
+          </svg>
+          <input id="searchInput" type="search" placeholder="搜索书名，想买哪本直接找" autocomplete="off"
+                 class="w-full rounded-full border border-orange-200 bg-orange-50/70 py-2.5 pl-9 pr-4 text-sm outline-none placeholder-orange-300/90 focus:bg-white focus:border-orange-400 focus:ring-2 focus:ring-orange-100 transition" data-page-node-id="9Lp0jJQiNBM6U7cQrChBmx" />
+        </div>
+        <button id="btnMyOrders" onclick="openOrders()" aria-label="我的订单"
+                style="flex:none;display:inline-flex;align-items:center;gap:4px;border:1px solid #f7d9b3;background:#fff7ed;color:#c2410c;border-radius:999px;padding:8px 12px;font-size:12px;font-weight:700;touch-action:manipulation;white-space:nowrap">
+          📋 我的订单
+        </button>
       </div>
       <div class="max-w-5xl mx-auto" data-page-node-id="1sQidTOrTe8smkdlMEdea1">
         <div id="chipRow" class="chip-scroll mt-2" data-page-node-id="lp4yr3IgPqzHc4CWrC73K6"></div>
@@ -282,11 +318,33 @@
         </div>
         <div class="text-rose-600" style="font-size:24px;font-weight:800" data-page-node-id="KvQDif98EpJtMS0ROGPEoa">¥<span id="coTotal" data-page-node-id="aYrUOq6A0VclyOu1MPn8GO">0.00</span></div>
       </div>
+
+      <!-- 下单前红色警示 -->
+      <div style="margin-top:12px;background:#fdecec;border:1px solid #fecaca;border-radius:10px;padding:10px 12px;color:#dc2626;font-size:14px;font-weight:800;line-height:1.6;text-align:center" data-page-node-id="NOTICE_CO">
+        一经下单付款再送达，非我方送错漏，概不退换，希望理解！
+      </div>
     </div>
     <!-- 底部按钮 -->
     <div class="co-foot" data-page-node-id="1rzH7pKChYfRXXaUUOGYdz">
       <button id="btnCancel" style="flex:1;border:1px solid #e2e8f0;background:#fff;color:#334155;border-radius:12px;font-size:16px;font-weight:700;padding:12px 0;touch-action:manipulation" data-page-node-id="RsfySVTUy1owJbQMkozuHM">取消</button>
       <button id="btnConfirm" style="flex:1;border:none;background:#f97316;color:#fff;border-radius:12px;font-size:16px;font-weight:700;padding:12px 0;touch-action:manipulation" data-page-node-id="8A0iyJHfXS4oNaofxQE9Wn">确认下单</button>
+    </div>
+  </div>
+
+  <!-- ============ 我的订单弹层（可随时找回并复制历史订单） ============ -->
+  <div id="ordersVeil" onclick="closeOrders()" data-page-node-id="ORDERS_VEIL"></div>
+  <div id="ordersPanel" role="dialog" aria-label="我的订单" data-page-node-id="ORDERS_PANEL">
+    <div class="or-head" data-page-node-id="ORDERS_HEAD">
+      <h2 class="text-[16px] font-bold" style="margin:0;color:#4a2c12" data-page-node-id="ORDERS_H2">📋 我的订单</h2>
+      <button onclick="closeOrders()" aria-label="关闭"
+              style="border:none;background:none;font-size:20px;color:#9a6a3a;line-height:1;padding:4px" data-page-node-id="ORDERS_X">✕</button>
+    </div>
+    <div class="or-body" data-page-node-id="ORDERS_BODY">
+      <div class="or-search" data-page-node-id="ORDERS_SEARCH">
+        <input id="ordersPhone" type="text" inputmode="tel" placeholder="输入下单时填写的手机号/微信号查询" autocomplete="off" data-page-node-id="ORDERS_PHONE" />
+        <button onclick="queryOrders()" data-page-node-id="ORDERS_BTN">查询</button>
+      </div>
+      <div id="ordersList" data-page-node-id="ORDERS_LIST"></div>
     </div>
   </div>
 
@@ -904,6 +962,9 @@
         const total = data.total_price;
         const count = data.total_count;
 
+        // 记录本次订单的手机号+订单号，供「我的订单」一键找回
+        rememberOrder(phone, data.order_no);
+
         CartManager.clear();
         closeCart();
         closeCheckout();
@@ -999,6 +1060,114 @@
       copyText(lastOrderText, "订单信息已复制！请打开微信发送给店主");
     });
 
+    // ============ 我的订单：随时找回并复制历史订单 ============
+    const ORDER_KEY = "sx_last_order_v1"; // 存最近一次下单的手机号+订单号，用于快速定位
+    let __cachedOrders = []; // 查询结果缓存，供复制时按单号取快照
+
+    // 下单成功后调用：记录手机号+订单号，方便「我的订单」一键查询
+    function rememberOrder(phone, orderNo) {
+      try {
+        localStorage.setItem(ORDER_KEY, JSON.stringify({ phone, orderNo, at: Date.now() }));
+      } catch (e) {}
+    }
+    function lastOrderInfo() {
+      try {
+        const d = JSON.parse(localStorage.getItem(ORDER_KEY) || "null");
+        return d && d.phone ? d : null;
+      } catch (e) { return null; }
+    }
+
+    // 由订单快照(items)生成可复制的订单文案（与下单成功页一致）
+    function orderTextFrom(o) {
+      const L = [];
+      L.push("【二手书订单】");
+      L.push("——— 买家信息 ———");
+      L.push(`姓名：${o.buyer_name || "（未填）"}`);
+      L.push(`手机/微信：${o.buyer_phone || "（未填）"}`);
+      if (o.buyer_grade) L.push(`年级：${o.buyer_grade}`);
+      if (o.buyer_addr) L.push(`收货：${o.buyer_addr}`);
+      L.push("——— 商品明细 ———");
+      const items = o.items || [];
+      items.forEach((it) => {
+        const t = (it.title || "").trim() || "（书名待补）";
+        const au = (it.author || "").trim();
+        L.push(`${it.qty}. ${t}${au ? "（" + au + "）" : ""} × ${it.qty}   ${fmt((it.price || 0) * it.qty)}`);
+      });
+      L.push(`合计：${fmt(o.total_price || 0)}（共 ${o.total_count || 0} 件）`);
+      if (STORE_WECHAT && STORE_WECHAT !== "XXXXX") L.push(`店主微信：${STORE_WECHAT}`);
+      L.push("请核对订单无误，确认后再付款，谢谢！");
+      return L.join("\n");
+    }
+
+    function openOrders() {
+      const info = lastOrderInfo();
+      if (info && info.phone) {
+        $("#ordersPhone").value = info.phone;
+        queryOrders();
+      } else {
+        $("#ordersList").innerHTML = `<div class="or-empty">还没有下单记录<br><span style="font-size:12px">下单后可在这里找回并复制订单</span></div>`;
+      }
+      $("#ordersVeil").classList.add("on");
+      $("#ordersPanel").classList.add("open");
+      lockScroll();
+    }
+    function closeOrders() {
+      const p = $("#ordersPanel");
+      if (!p.classList.contains("open")) return;
+      p.classList.remove("open");
+      $("#ordersVeil").classList.remove("on");
+      unlockScroll();
+    }
+
+    async function queryOrders() {
+      const phone = ($("#ordersPhone").value || "").trim();
+      const box = $("#ordersList");
+      if (!phone) { toast("请输入下单时填写的手机号/微信号"); return; }
+      box.innerHTML = `<div class="or-empty">查询中…</div>`;
+      try {
+        const res = await fetch(API_BASE + "/api/orders?phone=" + encodeURIComponent(phone));
+        const data = await res.json().catch(() => ({}));
+        if (!data.ok || !Array.isArray(data.orders)) {
+          box.innerHTML = `<div class="or-empty">查询失败：${(data.error || "网络异常")}</div>`;
+          return;
+        }
+        if (data.orders.length === 0) {
+          __cachedOrders = [];
+          box.innerHTML = `<div class="or-empty">没有查到订单<br><span style="font-size:12px">请确认手机号/微信号与下单时填写的一致</span></div>`;
+          return;
+        }
+        __cachedOrders = data.orders;
+        box.innerHTML = data.orders.map((o) => {
+          const t = o.created_at ? String(o.created_at).replace("T", " ").slice(0, 16) : "";
+          const lines = (o.items || []).map((it) => {
+            const name = (it.title || "").trim() || "（书名待补）";
+            return `<div class="or-line"><span class="nm">${esc(name)} × ${it.qty}</span><span class="pr">${fmt((it.price || 0) * it.qty)}</span></div>`;
+          }).join("");
+          return `<div class="or-item" data-order="${esc(o.order_no)}">
+            <div class="or-top"><span class="or-no">单号 ${esc(o.order_no)}</span><span class="or-time">${esc(t)}</span></div>
+            ${lines}
+            <div class="or-sum">
+              <span class="amt">${fmt(o.total_price || 0)} <small style="font-size:11px;color:#b08c5c;font-weight:400">共 ${o.total_count || 0} 件</small></span>
+              <button class="or-copy" data-copy="${esc(o.order_no)}">📋 复制订单信息</button>
+            </div>
+          </div>`;
+        }).join("");
+        try { localStorage.setItem(ORDER_KEY, JSON.stringify({ phone, orderNo: (data.orders[0] && data.orders[0].order_no) || "", at: Date.now() })); } catch (e) {}
+      } catch (e) {
+        box.innerHTML = `<div class="or-empty">网络异常，请稍后重试</div>`;
+      }
+    }
+
+    // 事件委托：复制单条订单
+    $("#ordersList").addEventListener("click", (e) => {
+      const btn = e.target.closest("button[data-copy]");
+      if (!btn) return;
+      const orderNo = btn.dataset.copy;
+      const o = __cachedOrders.find((x) => x.order_no === orderNo);
+      if (!o) { toast("未找到该订单"); return; }
+      copyText(orderTextFrom(o), "订单信息已复制！请打开微信发送给店主");
+    });
+
     // ============ 进入欢迎提示框 ============
     function openWelcome() {
       $("#welVeil").classList.add("on");
@@ -1017,6 +1186,7 @@
     document.addEventListener("keydown", (e) => {
       if (e.key !== "Escape") return;
       if ($("#okPanel").classList.contains("open")) closeOrderSuccess();
+      else if ($("#ordersPanel").classList.contains("open")) closeOrders();
       else if ($("#welPanel").classList.contains("open")) closeWelcome();
       else if ($("#lightbox").classList.contains("open")) closeLightbox();
       else if ($("#coPanel").classList.contains("open")) closeCheckout();

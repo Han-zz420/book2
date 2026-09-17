@@ -67,6 +67,44 @@ export default {
       return json({ ok: true, book });
     }
 
+    // ---- 我的订单：按手机号/微信号查询历史订单 ----
+    if (request.method === "GET" && path === "/api/orders") {
+      try {
+        const phone = (url.searchParams.get("phone") || "").trim();
+        if (!phone) {
+          return json({ ok: false, error: "缺少 phone 参数" }, 400);
+        }
+        const { results } = await env.DB.prepare(
+          "SELECT id, order_no, buyer_name, buyer_phone, buyer_grade, buyer_addr, items_json, total_price, total_count, status, created_at FROM orders WHERE buyer_phone = ? ORDER BY id DESC LIMIT 50"
+        ).bind(phone).all();
+        const orders = results.map((r) => {
+          let items = [];
+          try { items = JSON.parse(r.items_json || "[]"); } catch (e) { items = []; }
+          return { ...r, items };
+        });
+        return json({ ok: true, orders });
+      } catch (e) {
+        return json({ ok: false, error: "查询订单失败: " + e.message }, 500);
+      }
+    }
+
+    // ---- 按订单号查询单个订单 ----
+    const orderMatch = path.match(/^\/api\/orders\/([A-Za-z0-9]+)$/);
+    if (request.method === "GET" && orderMatch) {
+      try {
+        const no = orderMatch[1];
+        const row = await env.DB.prepare(
+          "SELECT id, order_no, buyer_name, buyer_phone, buyer_grade, buyer_addr, items_json, total_price, total_count, status, created_at FROM orders WHERE order_no = ?"
+        ).bind(no).first();
+        if (!row) return json({ ok: false, error: "订单不存在" }, 404);
+        let items = [];
+        try { items = JSON.parse(row.items_json || "[]"); } catch (e) { items = []; }
+        return json({ ok: true, order: { ...row, items } });
+      } catch (e) {
+        return json({ ok: false, error: "查询订单失败: " + e.message }, 500);
+      }
+    }
+
     // ---- 下单 ----
     if (request.method === "POST" && path === "/api/order") {
       let body;

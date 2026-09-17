@@ -5392,7 +5392,7 @@
   "author": "",
   "ocr": "",
   "price": 8.8,
-  "stock": 20,
+  "stock": 50,
   "category": "公共课"
  },
  {
@@ -5526,5 +5526,5 @@
   "price": 8.8,
   "stock": 20,
   "category": "公共课"
- }
+ } 
 ]
