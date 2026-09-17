@@ -341,7 +341,7 @@
     </div>
     <div class="or-body" data-page-node-id="ORDERS_BODY">
       <div class="or-search" data-page-node-id="ORDERS_SEARCH">
-        <input id="ordersPhone" type="text" inputmode="tel" placeholder="输入下单时填写的手机号/微信号查询" autocomplete="off" data-page-node-id="ORDERS_PHONE" />
+        <input id="ordersPhone" type="text" placeholder="输入手机号 / 微信号 / 宿舍号查询" autocomplete="off" data-page-node-id="ORDERS_PHONE" />
         <button onclick="queryOrders()" data-page-node-id="ORDERS_BTN">查询</button>
       </div>
       <div id="ordersList" data-page-node-id="ORDERS_LIST"></div>
@@ -1122,7 +1122,7 @@
     async function queryOrders() {
       const phone = ($("#ordersPhone").value || "").trim();
       const box = $("#ordersList");
-      if (!phone) { toast("请输入下单时填写的手机号/微信号"); return; }
+      if (!phone) { toast("请输入下单时填写的手机号/微信号/宿舍号"); return; }
       box.innerHTML = `<div class="or-empty">查询中…</div>`;
       try {
         const res = await fetch(API_BASE + "/api/orders?phone=" + encodeURIComponent(phone));
@@ -1133,7 +1133,7 @@
         }
         if (data.orders.length === 0) {
           __cachedOrders = [];
-          box.innerHTML = `<div class="or-empty">没有查到订单<br><span style="font-size:12px">请确认手机号/微信号与下单时填写的一致</span></div>`;
+          box.innerHTML = `<div class="or-empty">没有查到订单<br><span style="font-size:12px">请确认手机号/微信号/宿舍号与下单时填写的一致</span></div>`;
           return;
         }
         __cachedOrders = data.orders;

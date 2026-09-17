@@ -82,9 +82,10 @@ export async function onRequest(context) {
       if (!phone) {
         return json({ ok: false, error: "缺少 phone 参数" }, 400);
       }
+      const kw = "%" + phone + "%";
       const { results } = await env.DB.prepare(
-        "SELECT id, order_no, buyer_name, buyer_phone, buyer_grade, buyer_addr, items_json, total_price, total_count, status, created_at FROM orders WHERE buyer_phone = ? ORDER BY id DESC LIMIT 50"
-      ).bind(phone).all();
+        "SELECT id, order_no, buyer_name, buyer_phone, buyer_grade, buyer_addr, items_json, total_price, total_count, status, created_at FROM orders WHERE buyer_phone LIKE ? OR buyer_addr LIKE ? OR buyer_name LIKE ? ORDER BY id DESC LIMIT 50"
+      ).bind(kw, kw, kw).all();
       // 解析 items_json 便于前端直接展示/复制
       const orders = results.map((r) => {
         let items = [];
