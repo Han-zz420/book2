@@ -116,6 +116,20 @@
     #okPanel.open{opacity:1;transform:translate(-50%,-50%);pointer-events:auto}
     .ok-scroll{overflow-y:auto;-webkit-overflow-scrolling:touch;padding:22px 18px calc(14px + env(safe-area-inset-bottom));text-align:center}
 
+    /* ============ 暂停出售提示框 ============ */
+    #soldoutVeil{position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:122;opacity:0;pointer-events:none;transition:opacity .22s}
+    #soldoutVeil.on{opacity:1;pointer-events:auto}
+    #soldoutPanel{position:fixed;left:50%;top:50%;transform:translate(-50%,-46%) scale(.96);width:min(86vw,400px);
+      background:#fff;border-radius:20px;z-index:124;box-sizing:border-box;padding:28px 22px 22px;text-align:center;
+      opacity:0;pointer-events:none;transition:.25s;box-shadow:0 22px 60px rgba(0,0,0,.32)}
+    #soldoutPanel.open{opacity:1;transform:translate(-50%,-50%);pointer-events:auto}
+    #soldoutPanel .so-icon{font-size:44px;line-height:1}
+    #soldoutPanel .so-title{font-size:17px;font-weight:800;color:#1e293b;margin:12px 0 8px}
+    #soldoutPanel .so-desc{font-size:14px;color:#475569;line-height:1.7}
+    #soldoutPanel .so-btn{margin-top:18px;width:100%;border:none;border-radius:12px;background:#f97316;color:#fff;
+      font-size:15px;font-weight:700;padding:12px 0;touch-action:manipulation}
+    #soldoutPanel .so-btn:active{opacity:.85}
+
     /* ============ 进入欢迎提示框 ============ */
     #welPanel{position:fixed;left:50%;top:50%;transform:translate(-50%,-46%) scale(.96);width:min(86vw,400px);
       background:#fff;border-radius:20px;z-index:120;box-sizing:border-box;padding:26px 22px 20px;text-align:center;
@@ -346,6 +360,15 @@
       </div>
       <div id="ordersList" data-page-node-id="ORDERS_LIST"></div>
     </div>
+  </div>
+
+  <!-- ============ 暂停出售提示框 ============ -->
+  <div id="soldoutVeil" onclick="closeSoldout()" data-page-node-id="SOLD_OUT_VEIL"></div>
+  <div id="soldoutPanel" role="alertdialog" aria-label="暂停出售" data-page-node-id="SOLD_OUT_PANEL">
+    <div class="so-icon" data-page-node-id="SOLD_OUT_ICON">📢</div>
+    <div class="so-title" data-page-node-id="SOLD_OUT_TITLE">暂时无法出售</div>
+    <div class="so-desc" data-page-node-id="SOLD_OUT_DESC">目前书本暂时无法出售，可以先在主页添加客服二维码进行咨询。</div>
+    <button class="so-btn" onclick="closeSoldout()" data-page-node-id="SOLD_OUT_BTN">知道了</button>
   </div>
 
   <!-- ============ 下单成功弹层（确认后才出现：二维码 + 复制订单去微信） ============ -->
@@ -915,68 +938,27 @@
       unlockScroll();
     }
 
+    // ============ 暂停出售提示框 ============
+    function openSoldout() {
+      $("#soldoutVeil").classList.add("on");
+      $("#soldoutPanel").classList.add("open");
+      lockScroll();
+    }
+    function closeSoldout() {
+      const p = $("#soldoutPanel");
+      if (!p.classList.contains("open")) return;
+      p.classList.remove("open");
+      $("#soldoutVeil").classList.remove("on");
+      unlockScroll();
+    }
+
     // 点【确认下单】：校验 → 调用后端 API 原子扣库存 → 成功后清空购物车 → 弹出二维码/复制订单页
     async function confirmOrder() {
       if (!CartManager.checkout()) { toast("购物车空空如也"); return; }
-      const name = $("#ckName").value.trim();
-      const phone = $("#ckPhone").value.trim();
-      if (!name) { toast("请填写姓名"); return; }
-      if (!phone) { toast("请填写手机号/微信号"); return; }
 
-      // 禁用按钮，防止重复提交
-      const btnConfirm = $("#btnConfirm");
-      if (btnConfirm.dataset.submitting === "1") return;
-      btnConfirm.dataset.submitting = "1";
-      btnConfirm.disabled = true;
-      btnConfirm.textContent = "提交中…";
-
-      lastOrderText = buildOrderText();          // 快照（在清空购物车前）
-
-      const payload = {
-        name, phone,
-        grade: $("#ckGrade").value.trim(),
-        addr: $("#ckAddr").value.trim(),
-        items: CartManager.items.map((it) => ({ id: Number(it.id), qty: it.qty })),
-      };
-
-      try {
-        const res = await fetch(API_BASE + "/api/order", {
-          method: "POST",
-          headers: { "content-type": "application/json" },
-          body: JSON.stringify(payload),
-        });
-        const data = await res.json().catch(() => ({}));
-
-        if (!res.ok || !data.ok) {
-          const err = data.error || "下单失败，请稍后重试";
-          toast(err);
-          // 若库存不足，刷新库存并让用户重新调整购物车
-          if (data.code === "OUT_OF_STOCK") {
-            await refreshStocks();
-            CartManager.load(); // 重新裁剪购物车到有效库存
-          }
-          return;
-        }
-
-        // 成功：服务端已扣库存并写入订单
-        const total = data.total_price;
-        const count = data.total_count;
-
-        // 记录本次订单的手机号+订单号，供「我的订单」一键找回
-        rememberOrder(phone, data.order_no);
-
-        CartManager.clear();
-        closeCart();
-        closeCheckout();
-        await refreshStocks();   // 立即用服务端最新库存刷新卡片
-        openOrderSuccess(total, count);
-      } catch (e) {
-        toast("网络异常，下单失败，请重试");
-      } finally {
-        btnConfirm.dataset.submitting = "0";
-        btnConfirm.disabled = false;
-        btnConfirm.textContent = "确认下单";
-      }
+      // 暂停真实下单：直接弹出提示框，不再请求后端、不弹出复制订单页
+      openSoldout();
+      return;
     }
     function renderCheckoutContent(keepForm) {
       const items = CartManager.items;
@@ -1186,6 +1168,7 @@
     document.addEventListener("keydown", (e) => {
       if (e.key !== "Escape") return;
       if ($("#okPanel").classList.contains("open")) closeOrderSuccess();
+      else if ($("#soldoutPanel").classList.contains("open")) closeSoldout();
       else if ($("#ordersPanel").classList.contains("open")) closeOrders();
       else if ($("#welPanel").classList.contains("open")) closeWelcome();
       else if ($("#lightbox").classList.contains("open")) closeLightbox();
